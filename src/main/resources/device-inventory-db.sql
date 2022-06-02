@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS "app-db"."user"
     patronymic character varying(40)[],
     login character varying(40)[] NOT NULL,
     password character varying(40)[] NOT NULL,
-    role name[] NOT NULL,
+    "roleId" integer NOT NULL,
     active boolean NOT NULL DEFAULT true,
     email character varying(255)[] NOT NULL,
     PRIMARY KEY (id)
@@ -36,15 +36,7 @@ CREATE TABLE IF NOT EXISTS "app-db".device
 (
     id bigserial NOT NULL,
     "deviceName" character varying(40)[] NOT NULL,
-    PRIMARY KEY (id)
-);
-
-CREATE TABLE IF NOT EXISTS "app-db"."userDevice"
-(
-    id bigserial NOT NULL,
-    "deviceId" bigint NOT NULL,
-    "userId" bigint NOT NULL,
-    date timestamp without time zone NOT NULL,
+    "userId" bigint,
     PRIMARY KEY (id)
 );
 
@@ -54,27 +46,37 @@ CREATE TABLE IF NOT EXISTS "app-db".session
     "userId" bigint NOT NULL
 );
 
-ALTER TABLE IF EXISTS "app-db"."userDevice"
-    ADD FOREIGN KEY ("userId")
-    REFERENCES "app-db"."user" (id) MATCH SIMPLE
+CREATE TABLE IF NOT EXISTS "app-db".role
+(
+    id serial NOT NULL,
+    authority character varying(40) NOT NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT uq_id UNIQUE (id)
+);
+
+ALTER TABLE IF EXISTS "app-db"."user"
+    ADD CONSTRAINT "user_roleId" FOREIGN KEY ("roleId")
+    REFERENCES "app-db".role (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION
     NOT VALID;
 
 
-ALTER TABLE IF EXISTS "app-db"."userDevice"
-    ADD FOREIGN KEY ("deviceId")
-    REFERENCES "app-db".device (id) MATCH SIMPLE
+ALTER TABLE IF EXISTS "app-db".device
+    ADD CONSTRAINT "device_userId" FOREIGN KEY ("userId")
+    REFERENCES "app-db"."user" (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION
     NOT VALID;
 
 
 ALTER TABLE IF EXISTS "app-db".session
-    ADD FOREIGN KEY ("userId")
+    ADD CONSTRAINT "session_userId" FOREIGN KEY ("userId")
     REFERENCES "app-db"."user" (id) MATCH SIMPLE
     ON UPDATE NO ACTION
-    ON DELETE NO ACTION
+    ON DELETE CASCADE
     NOT VALID;
+
+ALTER ROLE admin SET search_path TO "app-db";
 
 END;
