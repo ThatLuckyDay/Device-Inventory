@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 
@@ -14,10 +13,12 @@ import javax.persistence.*;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-@Table(name = "role")
-public class Role implements GrantedAuthority {
+@Table(schema = "\"app-db\"", name = "role")
+public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
-    String authority;
+    @Enumerated(EnumType.STRING)
+    @Column
+    RoleType roleName;
 }
