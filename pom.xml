@@ -24,8 +24,8 @@
         <spring.starter.test.version>2.6.3</spring.starter.test.version>
         <spring.starter.jpa.version>2.6.3</spring.starter.jpa.version>
         <spring.starter.jdbc.version>2.6.3</spring.starter.jdbc.version>
-<!--        <spring.starter.redis.version>2.6.3</spring.starter.redis.version>-->
-<!--        <spring.session.redis.version>2.5.4</spring.session.redis.version>-->
+        <!--        <spring.starter.redis.version>2.6.3</spring.starter.redis.version>-->
+        <!--        <spring.session.redis.version>2.5.4</spring.session.redis.version>-->
         <spring.starter.security.version>2.6.3</spring.starter.security.version>
         <spring.starter.web.version>2.5.14</spring.starter.web.version>
         <mapstruct.version>1.4.2.Final</mapstruct.version>
@@ -37,9 +37,10 @@
         <junit-jupiter.version>5.8.2</junit-jupiter.version>
         <powermock.version>2.0.7</powermock.version>
         <flyway.core.version>8.4.3</flyway.core.version>
-                <spring.session.jdbc.version>2.5.4</spring.session.jdbc.version>
+        <spring.session.jdbc.version>2.5.4</spring.session.jdbc.version>
         <postgresql.version>42.2.25</postgresql.version>
         <spring.security.test.version>5.6.1</spring.security.test.version>
+        <jsonwebtoken.version>0.9.1</jsonwebtoken.version>
     </properties>
     <dependencies>
         <dependency>
@@ -47,11 +48,11 @@
             <artifactId>spring-boot-starter-data-jdbc</artifactId>
             <version>${spring.starter.jdbc.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-starter-data-redis</artifactId>-->
-<!--            <version>${spring.starter.redis.version}</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.springframework.boot</groupId>-->
+        <!--            <artifactId>spring-boot-starter-data-redis</artifactId>-->
+        <!--            <version>${spring.starter.redis.version}</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
@@ -82,11 +83,11 @@
             <artifactId>flyway-core</artifactId>
             <version>${flyway.core.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.session</groupId>-->
-<!--            <artifactId>spring-session-data-redis</artifactId>-->
-<!--            <version>${spring.session.redis.version}</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.springframework.session</groupId>-->
+        <!--            <artifactId>spring-session-data-redis</artifactId>-->
+        <!--            <version>${spring.session.redis.version}</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>org.springframework.session</groupId>
             <artifactId>spring-session-jdbc</artifactId>
@@ -165,6 +166,11 @@
             <artifactId>powermock-api-mockito2</artifactId>
             <version>${powermock.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.9.1</version>
         </dependency>
 
     </dependencies>

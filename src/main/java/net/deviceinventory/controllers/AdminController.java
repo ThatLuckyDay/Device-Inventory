@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.deviceinventory.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 @RequestMapping(value = "/api")
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
     AdminService adminService;
 

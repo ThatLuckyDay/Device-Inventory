@@ -22,24 +22,24 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
-    @Column
+    @Column(nullable = false)
     String firstName;
-    @Column
+    @Column(nullable = false)
     String lastName;
     @Column
     String patronymic;
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     String username;
-    @Column
+    @Column(nullable = false)
     String password;
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     String email;
     boolean active;
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
-            name = "authority",
-            joinColumns = @JoinColumn(name = "userId"),
-            inverseJoinColumns = @JoinColumn(name = "roleId")
+            schema = "\"app-db\"", name = "authority",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     Set<Role> role = new HashSet<>();
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
