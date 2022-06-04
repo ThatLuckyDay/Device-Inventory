@@ -15,10 +15,13 @@ import javax.persistence.*;
 @Entity
 @Table(schema = "\"app-db\"", name = "role")
 public class Role {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
+
     @Enumerated(EnumType.STRING)
     @Column
     RoleType roleName;
+
 }

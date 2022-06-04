@@ -50,12 +50,10 @@ public class UserService {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        // To Header: Authorization
         String jwt = jwtUtils.generateJwtToken(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
         return gson.toJson(mapper.toUserDto(userDetails));
     }
 
@@ -90,9 +88,12 @@ public class UserService {
                 }
             });
         }
+        /*----------- Test data -------------*/
+        /* Move to request */
         user.setRole(roles);
         user.setFirstName("user");
         user.setLastName("user");
+        /* -----------------------------------*/
         user.setActive(true);
         userDao.save(user);
         return "User registered successfully!";

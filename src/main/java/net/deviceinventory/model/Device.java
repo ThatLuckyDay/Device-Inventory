@@ -15,10 +15,14 @@ import javax.persistence.*;
 @Entity
 @Table(schema = "\"app-db\"", name = "device")
 public class Device {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
+
+    @Column(nullable = false)
     String deviceName;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     User user;

@@ -19,22 +19,31 @@ import java.util.Set;
 @Entity
 @Table(schema = "\"app-db\"", name = "user")
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
+
     @Column(nullable = false)
     String firstName;
+
     @Column(nullable = false)
     String lastName;
+
     @Column
     String patronymic;
+
     @Column(unique = true, nullable = false)
     String username;
+
     @Column(nullable = false)
     String password;
+
     @Column(unique = true, nullable = false)
     String email;
+
     boolean active;
+
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
             schema = "\"app-db\"", name = "authority",
@@ -42,6 +51,7 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     Set<Role> role = new HashSet<>();
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     List<Device> devices = new ArrayList<>();
 
