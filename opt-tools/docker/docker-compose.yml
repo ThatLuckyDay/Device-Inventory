@@ -1,0 +1,34 @@
+version: "3"
+
+services:
+  device-inventory:
+    build:
+      context: ../../
+      dockerfile: ./ops-tools/docker/images/device-inventory/Dockerfile
+    volumes:
+      - ../../:/device-inventory
+    networks:
+      - di-net
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
+  postgres:
+    image: "postgres:14.1-alpine"
+    restart: always
+    networks:
+      - di-net
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admib
+      POSTGRES_DB: device-inventory-db
+      POSTGRES_HOST: postgres
+#    volumes:
+#      - ../../data/postgres:/var/lib/postgresql/data
+
+networks:
+  di-net:
+    driver: bridge

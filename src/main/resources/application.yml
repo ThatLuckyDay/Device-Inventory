@@ -1,4 +1,5 @@
 spring:
+  ## Oauth2 Security
   security:
     oauth2:
       client:
@@ -9,3 +10,23 @@ spring:
             scope:
               - email
               - openid
+  ## PostgreSQL
+  datasource:
+    url: jdbc:postgresql://localhost:5432/device-inventory-db
+    username: admin
+    password: admin
+    driver-class-name: org.postgresql.Driver
+  ## JPA, Hibernate
+  jpa:
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+    generate-ddl: true
+    hibernate.ddl-auto: update
+
+## Flyway
+flyway:
+  user: admin
+  password: admin
+  schemas: app-db
+  url: jdbc:postgresql://localhost:5432/device-inventory-db
+  locations: filesystem:db/migration
