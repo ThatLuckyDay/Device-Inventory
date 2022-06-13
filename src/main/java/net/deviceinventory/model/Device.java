@@ -23,7 +23,7 @@ public class Device {
     @Column(nullable = false)
     String deviceName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     User user;
 }

@@ -17,6 +17,11 @@ import java.util.Set;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RegisterRequest {
     @NotBlank
+    private String firstName;
+    @NotBlank
+    private String lastName;
+    private String patronymic;
+    @NotBlank
     @Size(min = 3, max = 20)
     private String username;
     @NotBlank

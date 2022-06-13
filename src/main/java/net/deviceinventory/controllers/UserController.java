@@ -4,35 +4,57 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import net.deviceinventory.dto.request.LoginRequest;
+import net.deviceinventory.dto.request.RegisterRequest;
 import net.deviceinventory.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.util.Collections;
+import java.util.Map;
 
 @Slf4j
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor(onConstructor = @__(@Autowired))
-@RequestMapping(value = "/api")
 public class UserController {
     UserService userService;
 
-    @PostMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String registerUser() {
-        return null;
+    @GetMapping("/user")
+    public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) {
+        return Collections.singletonMap("name", principal.getAttribute("name"));
     }
 
-    @PostMapping(value = "/sessions", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String login() {
-        return null;
+    @GetMapping("/error")
+    @ResponseBody
+    public String error(HttpServletRequest request) {
+        String message = (String) request.getSession().getAttribute("error.message");
+        request.getSession().removeAttribute("error.message");
+        return message;
     }
 
-    @DeleteMapping(value = "/sessions", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/api/users", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String registerUser(@Valid @RequestBody RegisterRequest registerRequest, HttpServletResponse response) {
+        return userService.register(registerRequest, response);
+    }
+
+    @PostMapping(value = "/api/sessions", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String login(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+        return userService.login(loginRequest, response);
+    }
+
+    @DeleteMapping(value = "/api/sessions", produces = MediaType.APPLICATION_JSON_VALUE)
     public String logout() {
         return null;
     }
 
-    @DeleteMapping(value = "/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/api/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
     public String leave() {
         return null;
     }
