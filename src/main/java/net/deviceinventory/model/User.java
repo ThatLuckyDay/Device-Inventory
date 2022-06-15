@@ -17,7 +17,7 @@ import java.util.Set;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-@Table(schema = "\"app-db\"", name = "user")
+@Table(name = "user")
 public class User {
 
     @Id

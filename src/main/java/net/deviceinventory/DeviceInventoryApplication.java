@@ -8,8 +8,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class DeviceInventoryApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(DeviceInventoryApplication.class, args);
-        System.out.println("Hello device");
+        try {
+            SpringApplication.run(DeviceInventoryApplication.class, args);
+            System.out.println("Hello device");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

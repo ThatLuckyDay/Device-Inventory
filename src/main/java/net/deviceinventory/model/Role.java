@@ -13,7 +13,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-@Table(schema = "\"app-db\"", name = "role")
+@Table(name = "role")
 public class Role {
 
     @Id

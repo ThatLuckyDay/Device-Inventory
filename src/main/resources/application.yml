@@ -12,7 +12,7 @@ spring:
               - openid
   ## PostgreSQL
   datasource:
-    url: jdbc:postgresql://localhost:5432/device-inventory-db
+    url: jdbc:postgresql://localhost:5432/device-inventory-db?currentSchema=app-db
     username: admin
     password: admin
     driver-class-name: org.postgresql.Driver
@@ -21,7 +21,17 @@ spring:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQL10Dialect
     generate-ddl: true
-    hibernate.ddl-auto: update
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        default_schema: app-db
+  session:
+    store-type: jdbc
+    jdbc:
+      initialize-schema: never
+  flyway:
+    baselineOnMigrate: true
 
 ## Flyway
 flyway:
@@ -30,3 +40,4 @@ flyway:
   schemas: app-db
   url: jdbc:postgresql://localhost:5432/device-inventory-db
   locations: filesystem:db/migration
+
