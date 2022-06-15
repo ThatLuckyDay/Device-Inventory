@@ -23,7 +23,7 @@ services:
       - "5432:5432"
     environment:
       POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admib
+      POSTGRES_PASSWORD: admin
       POSTGRES_DB: device-inventory-db
       POSTGRES_HOST: postgres
 #    volumes:
