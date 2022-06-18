@@ -42,3 +42,4 @@ jobs:
           POSTGRES_HOST: postgres
           # The default PostgreSQL port
           POSTGRES_PORT: 5432
+          SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/device-inventory-db?currentSchema=di_db
