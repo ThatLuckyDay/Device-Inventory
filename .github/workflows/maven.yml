@@ -23,8 +23,8 @@ jobs:
           # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
+          --health-interval 300s
+          --health-timeout 50s
           --health-retries 5
 
     steps:
