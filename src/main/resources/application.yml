@@ -28,4 +28,6 @@ spring:
         default_schema: di_db
   flyway:
     baselineOnMigrate: true
-
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher

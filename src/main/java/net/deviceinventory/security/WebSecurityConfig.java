@@ -33,7 +33,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     final String[] AUTH_WHITELIST = {
             "/",
             "/error",
-            "/webjars/**"
+            "/webjars/**",
+            "/swagger-resources/**",
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/v3/api-docs",
     };
 
     @Bean
@@ -49,7 +53,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
         return request -> {
             OAuth2User user = delegate.loadUser(request);
-            if (!"github".equals(request.getClientRegistration().getRegistrationId())) {
+            if (!"google".equals(request.getClientRegistration().getRegistrationId())) {
                 return user;
             }
 
@@ -67,7 +71,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 return user;
             }
 
-            throw new OAuth2AuthenticationException(new OAuth2Error("invalid_token", "Not in Spring Team", ""));
+            throw new OAuth2AuthenticationException(new OAuth2Error("invalid_token",
+                    "Not in Spring Team", ""));
         };
     }
 
