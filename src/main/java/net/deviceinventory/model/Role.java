@@ -22,6 +22,6 @@ public class Role {
 
     @Enumerated(EnumType.STRING)
     @Column
-    RoleType roleName;
+    RoleType name;
 
 }

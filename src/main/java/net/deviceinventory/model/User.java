@@ -30,14 +30,8 @@ public class User {
     @Column(nullable = false)
     String lastName;
 
-    @Column
-    String patronymic;
-
     @Column(unique = true, nullable = false)
     String username;
-
-    @Column(nullable = false)
-    String password;
 
     @Column(unique = true, nullable = false)
     String email;

@@ -4,8 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import net.deviceinventory.dto.request.LoginRequest;
-import net.deviceinventory.dto.request.RegisterRequest;
+import net.deviceinventory.model.User;
 import net.deviceinventory.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -29,6 +28,7 @@ public class UserController {
     @GetMapping("/user")
     @ResponseBody
     public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) {
+
         return Collections.singletonMap("name", principal.getAttribute("name"));
     }
 
@@ -41,13 +41,13 @@ public class UserController {
     }
 
     @PostMapping(value = "/api/users", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String registerUser(@Valid @RequestBody RegisterRequest registerRequest, HttpServletResponse response) {
-        return userService.register(registerRequest, response);
+    public String registerUser(@Valid @RequestBody HttpServletResponse response) {
+        return null;
     }
 
     @PostMapping(value = "/api/sessions", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String login(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response) {
-        return userService.login(loginRequest, response);
+    public User login(OAuth2User oAuth2User) {
+        return userService.login(oAuth2User);
     }
 
     @DeleteMapping(value = "/api/sessions", produces = MediaType.APPLICATION_JSON_VALUE)
