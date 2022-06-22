@@ -13,8 +13,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.util.Collections;
 import java.util.Map;
 
@@ -25,10 +23,14 @@ import java.util.Map;
 public class UserController {
     UserService userService;
 
+    @RequestMapping(value = "/")
+    public String index() {
+        return "index";
+    }
+
     @GetMapping("/user")
     @ResponseBody
     public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) {
-
         return Collections.singletonMap("name", principal.getAttribute("name"));
     }
 
@@ -41,23 +43,18 @@ public class UserController {
     }
 
     @PostMapping(value = "/api/users", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String registerUser(@Valid @RequestBody HttpServletResponse response) {
-        return null;
-    }
-
-    @PostMapping(value = "/api/sessions", produces = MediaType.APPLICATION_JSON_VALUE)
-    public User login(OAuth2User oAuth2User) {
-        return userService.login(oAuth2User);
+    public User signIn(@AuthenticationPrincipal OAuth2User oAuth2User) {
+        return userService.signIn(oAuth2User);
     }
 
     @DeleteMapping(value = "/api/sessions", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String logout() {
-        return null;
+    public User signOut(@AuthenticationPrincipal OAuth2User oAuth2User) {
+        return userService.signOut(oAuth2User);
     }
 
     @DeleteMapping(value = "/api/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String leave() {
-        return null;
+    public User leave(@AuthenticationPrincipal OAuth2User oAuth2User) {
+        return userService.leave(oAuth2User);
     }
 
     @GetMapping(value = "/accounts", produces = MediaType.APPLICATION_JSON_VALUE)

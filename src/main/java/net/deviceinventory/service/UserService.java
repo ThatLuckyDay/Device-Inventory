@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import net.deviceinventory.dao.RoleDao;
 import net.deviceinventory.dao.UserDao;
 import net.deviceinventory.dto.mappers.UserDtoMapper;
 import net.deviceinventory.model.Role;
@@ -28,62 +27,29 @@ import java.util.Set;
 public class UserService {
     UserDtoMapper userDtoMapper;
     UserDao userDao;
-    RoleDao roleDao;
 
-    public User login(OAuth2User oAuth2User) {
-        return new User();
-    }
-
-    public User registerClient(OAuth2User oAuth2User) {
+    public User signIn(OAuth2User oAuth2User) {
         User user = userDtoMapper.fromUserDto(oAuth2User);
-        if (userDao.existsByEmail(user.getEmail())) throw new RuntimeException("User already present");
-        if (userDao.existsByUsername(user.getUsername())) throw new RuntimeException("User already present");
+        if (userDao.existsByEmail(user.getEmail())) return userDao.findByEmail(user.getEmail())
+                .orElseThrow(() -> new RuntimeException("500"));
         Set<Role> roles = new HashSet<>();
-        Role role = new Role();
-        role.setName(RoleType.ROLE_USER);
-        roles.add(role);
+        roles.add(new Role(0, RoleType.ROLE_USER));
         user.setRole(roles);
         user.setActive(true);
         userDao.save(user);
         return user;
     }
 
-    public User registerAdmin(OAuth2User oAuth2User) {
+    public User signOut(OAuth2User oAuth2User) {
+        return null;
+    }
+
+    public User leave(OAuth2User oAuth2User) {
         User user = userDtoMapper.fromUserDto(oAuth2User);
-        if (userDao.existsByEmail(user.getEmail())) throw new RuntimeException("User already present");
-        if (userDao.existsByUsername(user.getUsername())) throw new RuntimeException("User already present");
-        Set<Role> roles = new HashSet<>();
-        Role role = new Role();
-        role.setName(RoleType.ROLE_ADMIN);
-        roles.add(role);
-        user.setRole(roles);
-        user.setActive(true);
+        if (!userDao.existsByEmail(user.getEmail())) throw new RuntimeException("User not found");
+        user.setActive(false);
         userDao.save(user);
         return user;
     }
-
-    public Set<Role> parseRoles(Set<String> strRoles) {
-        Set<Role> roleSet = new HashSet<>();
-
-        if (strRoles == null) {
-            Role userRole = roleDao.findByName(RoleType.ROLE_USER)
-                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-            roleSet.add(userRole);
-        } else {
-            strRoles.forEach(role -> {
-                if ("admin".equals(role)) {
-                    Role adminRole = roleDao.findByName(RoleType.ROLE_ADMIN)
-                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                    roleSet.add(adminRole);
-                } else {
-                    Role userRole = roleDao.findByName(RoleType.ROLE_USER)
-                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                    roleSet.add(userRole);
-                }
-            });
-        }
-        return roleSet;
-    }
-
 
 }

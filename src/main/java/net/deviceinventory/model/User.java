@@ -31,9 +31,6 @@ public class User {
     String lastName;
 
     @Column(unique = true, nullable = false)
-    String username;
-
-    @Column(unique = true, nullable = false)
     String email;
 
     boolean active;
