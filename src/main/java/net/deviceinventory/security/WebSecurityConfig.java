@@ -15,7 +15,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     final String[] AUTH_WHITELIST = {
-            "/",
+            "/**",
             "/error",
             "/webjars/**",
             "/swagger-resources/**",

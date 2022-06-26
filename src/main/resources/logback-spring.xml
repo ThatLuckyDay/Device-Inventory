@@ -7,12 +7,15 @@
     <logger name="org.springframework.boot.test" level="OFF"/>
     <logger name="org.springframework.test" level="OFF"/>
     <logger name="com.zaxxer.hikari" level="OFF"/>
-<!--    <logger name="org.hibernate" level="OFF"/>-->
+    <logger name="org.hibernate" level="INFO"/>
     <property name="hibernate.show_sql" value="true"/>
     <logger name="_org.springframework.web" level="OFF"/>
     <logger name="o.j.logging" level="OFF"/>
     <logger name="o.a.i.l.LogFactory" level="OFF"/>
-
+    <logger name="springfox" level="OFF"/>
+    <logger name="Downloading from central" level="OFF"/>
+    <logger name="org.flywaydb" level="OFF"/>
+    <logger name="io.netty" level="OFF"/>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
