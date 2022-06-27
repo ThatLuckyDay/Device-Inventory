@@ -1,6 +1,7 @@
 import React from 'react';
 import * as ReactDOMClient from 'react-dom/client';
-import { Header } from './components/Header';
+import Header from './components/Header';
+import { CookiesProvider } from 'react-cookie';
 
 
 class MainPage extends React.Component {
@@ -17,4 +18,10 @@ class MainPage extends React.Component {
 
 // ========================================
 const root = ReactDOMClient.createRoot(document.getElementById('root'));
-root.render(<MainPage />);
+root.render(
+  <React.StrictMode>
+    <CookiesProvider>
+      <MainPage />
+    </CookiesProvider>
+  </React.StrictMode>
+);

@@ -11,20 +11,16 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
+import { useCookies } from 'react-cookie';
 
 
-export const Header = () => {
-  return (
-    <MenuAppBar />
-  )
-}
-
-export default function MenuAppBar() {
-  const [auth, setAuth] = React.useState(true);
+const Header = () => {
+  const [auth, setAuth] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [cookies] = useCookies(['XSRF-TOKEN']);
 
   const handleChange = (event) => {
-    window.location="/oauth2/authorization/google";
+    if (!auth) login();
     setAuth(event.target.checked);
   };
 
@@ -61,7 +57,7 @@ export default function MenuAppBar() {
             aria-label="menu"
             sx={{ mr: 2 }}
           >
-            <MenuIcon />
+          <MenuIcon />
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Devices
@@ -102,5 +98,15 @@ export default function MenuAppBar() {
       </AppBar>
 
     </Box>
-  );
+  )
 }
+
+const login = () => {
+  let port = (window.location.port ? ':' + window.location.port : '');
+  if (port === ':3000') {
+    port = ':8080';
+  }
+  window.location.href = `//${window.location.hostname}${port}/oauth2/authorization/google`;
+}
+
+export default Header;

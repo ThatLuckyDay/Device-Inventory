@@ -20,13 +20,10 @@ import java.util.Map;
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor(onConstructor = @__(@Autowired))
+@RequestMapping(value = "/api")
 public class UserController {
     UserService userService;
 
-    @RequestMapping(value = "/")
-    public String index() {
-        return "index";
-    }
 
     @GetMapping("/user")
     @ResponseBody
