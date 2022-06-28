@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -17,16 +17,32 @@ import { useCookies } from 'react-cookie';
 const Header = () => {
   const [auth, setAuth] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [cookies] = useCookies(['XSRF-TOKEN']);
-
-  const handleChange = (event) => {
-    if (!auth) login();
-    setAuth(event.target.checked);
-  };
+  const [cookies, removeCookie] = useCookies(['XSRF-TOKEN']);
+  const [user, setUser] = useState(undefined);
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
+  const handleChange = (event) => {
+    if (!auth) {
+      removeCookie('JSESSIONID');
+      removeCookie('XSRF-TOKEN');
+      login();
+      fetch('api/user', { credentials: 'include' })
+        .then(response => response.text())
+        .then(body => {
+          if (body !== '') {
+            setUser(JSON.parse(body));
+            setAuth(event.target.checked);
+          }
+      });
+    } else logout(cookies);
+  };
+
+  const message = user ?
+    <h2>Welcome, {user.name}!</h2> :
+    <p>Please log in to manage your Devices.</p>;
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -59,9 +75,6 @@ const Header = () => {
           >
           <MenuIcon />
           </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Devices
-          </Typography>
           {auth && (
             <div>
               <IconButton
@@ -97,8 +110,13 @@ const Header = () => {
         </Toolbar>
       </AppBar>
 
+      <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+        {message}
+      </Typography>
+
     </Box>
-  )
+
+  );
 }
 
 const login = () => {
@@ -107,6 +125,18 @@ const login = () => {
     port = ':8080';
   }
   window.location.href = `//${window.location.hostname}${port}/oauth2/authorization/google`;
+}
+
+const logout = (cookies) => {
+  fetch('/api/logout', {
+    method: 'POST', credentials: 'include',
+    headers: { 'X-XSRF-TOKEN': cookies['XSRF-TOKEN'] }
+  })
+    .then(res => res.json())
+    .then(response => {
+      window.location.href = `${response.logoutUrl}?id_token_hint=${response.idToken}`
+        + `&post_logout_redirect_uri=${window.location.origin}`;
+    });
 }
 
 export default Header;

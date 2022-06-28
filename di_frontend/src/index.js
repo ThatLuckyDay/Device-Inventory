@@ -2,18 +2,17 @@ import React from 'react';
 import * as ReactDOMClient from 'react-dom/client';
 import Header from './components/Header';
 import { CookiesProvider } from 'react-cookie';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 
-class MainPage extends React.Component {
-  render() {
-    return (
-      <div className="mainPage">
-        <div className="header" >
-          <Header />
-        </div>
-      </div>
-    );
-  }
+const MainPage = () => {
+  return (
+    <Router>
+      <Routes>
+        <Route exact path="/" element={<Header />}/>
+      </Routes>
+    </Router>
+  );
 }
 
 // ========================================
