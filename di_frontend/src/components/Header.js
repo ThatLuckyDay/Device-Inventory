@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -26,19 +26,41 @@ const Header = () => {
 
   const handleChange = (event) => {
     if (!auth) {
-      removeCookie('JSESSIONID');
-      removeCookie('XSRF-TOKEN');
       login();
-      fetch('api/user', { credentials: 'include' })
-        .then(response => response.text())
-        .then(body => {
-          if (body !== '') {
-            setUser(JSON.parse(body));
-            setAuth(event.target.checked);
-          }
-      });
-    } else logout(cookies);
+      if (user !== '') setAuth(event.target.checked);
+    } else {
+      logout(cookies);
+      setAuth(event.target.checked);
+    }
   };
+
+  const login = () => {
+    let port = (window.location.port ? ':' + window.location.port : '');
+    if (port === ':3000') {
+      port = ':8080';
+    }
+    window.location.href = `//${window.location.hostname}${port}/oauth2/authorization/google`;
+  }
+
+  useEffect(() => {
+    fetch('api/user', { credentials: 'include' })
+      .then(response => response.text())
+      .then(body => {
+        if (body !== '') setUser(JSON.parse(body));
+      });
+  }, [setUser])
+
+  const logout = (cookies) => {
+    fetch('/api/logout', {
+      method: 'POST', credentials: 'include',
+      headers: { 'X-XSRF-TOKEN': cookies['XSRF-TOKEN'] }
+    })
+      .then(res => res.json())
+      .then(response => {
+        window.location.href = `${response.logoutUrl}?id_token_hint=${response.idToken}`
+          + `&post_logout_redirect_uri=${window.location.origin}`;
+      });
+  }
 
   const message = user ?
     <h2>Welcome, {user.name}!</h2> :
@@ -117,26 +139,6 @@ const Header = () => {
     </Box>
 
   );
-}
-
-const login = () => {
-  let port = (window.location.port ? ':' + window.location.port : '');
-  if (port === ':3000') {
-    port = ':8080';
-  }
-  window.location.href = `//${window.location.hostname}${port}/oauth2/authorization/google`;
-}
-
-const logout = (cookies) => {
-  fetch('/api/logout', {
-    method: 'POST', credentials: 'include',
-    headers: { 'X-XSRF-TOKEN': cookies['XSRF-TOKEN'] }
-  })
-    .then(res => res.json())
-    .then(response => {
-      window.location.href = `${response.logoutUrl}?id_token_hint=${response.idToken}`
-        + `&post_logout_redirect_uri=${window.location.origin}`;
-    });
 }
 
 export default Header;
