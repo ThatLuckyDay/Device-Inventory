@@ -27,9 +27,9 @@ public class UserController {
 
     @GetMapping("/user")
     @ResponseBody
-    public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) {
-        if (principal == null) return null;
-        return Collections.singletonMap("name", principal.getAttribute("name"));
+    public Map<String, Object> user(@AuthenticationPrincipal OAuth2User oAuth2User) {
+        if (oAuth2User == null) return null;
+        return Collections.singletonMap("name", oAuth2User.getAttribute("name"));
     }
 
     @GetMapping("/error")
@@ -40,15 +40,30 @@ public class UserController {
         return message;
     }
 
+    @PostMapping(value = "/logout", produces = MediaType.APPLICATION_JSON_VALUE)
+    public User signOut(HttpServletRequest request, @AuthenticationPrincipal OAuth2User oAuth2User) {
+        request.getSession(false).invalidate();
+        return new User(
+                0,
+                oAuth2User.getAttribute("given_name"),
+                oAuth2User.getAttribute("family_name"),
+                oAuth2User.getAttribute("email"),
+                true,
+                null,
+                null
+        );
+    }
+
+
     @PostMapping(value = "/api/users", produces = MediaType.APPLICATION_JSON_VALUE)
     public User signIn(@AuthenticationPrincipal OAuth2User oAuth2User) {
         return userService.signIn(oAuth2User);
     }
 
-    @DeleteMapping(value = "/api/sessions", produces = MediaType.APPLICATION_JSON_VALUE)
-    public User signOut(@AuthenticationPrincipal OAuth2User oAuth2User) {
-        return userService.signOut(oAuth2User);
-    }
+//    @DeleteMapping(value = "/api/sessions", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public User signOut(@AuthenticationPrincipal OAuth2User oAuth2User) {
+//        return userService.signOut(oAuth2User);
+//    }
 
     @DeleteMapping(value = "/api/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
     public User leave(@AuthenticationPrincipal OAuth2User oAuth2User) {

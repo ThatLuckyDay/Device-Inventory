@@ -10,7 +10,7 @@ spring:
             scope:
               - profile
               - email
-            redirect-uri: "http://localhost:3000"
+            redirect-uri: http://localhost:8080/login/oauth2/code/google
   ## PostgreSQL
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/device-inventory-db?currentSchema=di_db}

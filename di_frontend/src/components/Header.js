@@ -17,7 +17,7 @@ import { useCookies } from 'react-cookie';
 const Header = () => {
   const [auth, setAuth] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [cookies, removeCookie] = useCookies(['XSRF-TOKEN']);
+  const [cookies, deleteCookie] = useCookies();
   const [user, setUser] = useState(undefined);
 
   const handleMenu = (event) => {
@@ -27,10 +27,8 @@ const Header = () => {
   const handleChange = (event) => {
     if (!auth) {
       login();
-      if (user !== '') setAuth(event.target.checked);
     } else {
-      logout(cookies);
-      setAuth(event.target.checked);
+      logout();
     }
   };
 
@@ -46,25 +44,28 @@ const Header = () => {
     fetch('api/user', { credentials: 'include' })
       .then(response => response.text())
       .then(body => {
-        if (body !== '') setUser(JSON.parse(body));
+        if (body !== '') {
+          setUser(JSON.parse(body));
+          setAuth(true);
+        }
       });
   }, [setUser])
 
-  const logout = (cookies) => {
+  const logout = () => {
     fetch('/api/logout', {
       method: 'POST', credentials: 'include',
       headers: { 'X-XSRF-TOKEN': cookies['XSRF-TOKEN'] }
     })
-      .then(res => res.json())
       .then(response => {
-        window.location.href = `${response.logoutUrl}?id_token_hint=${response.idToken}`
-          + `&post_logout_redirect_uri=${window.location.origin}`;
+        deleteCookie('XSRF-TOKEN');
+        setUser(undefined);
+        setAuth(false);
       });
   }
 
   const message = user ?
     <h2>Welcome, {user.name}!</h2> :
-    <p>Please log in to manage your Devices.</p>;
+    <p>Please log in to manage your Devices.</p> ;
 
   const handleClose = () => {
     setAnchorEl(null);
