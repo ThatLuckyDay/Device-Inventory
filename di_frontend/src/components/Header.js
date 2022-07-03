@@ -41,7 +41,7 @@ const Header = () => {
   }
 
   useEffect(() => {
-    fetch('api/user', { credentials: 'include' })
+    fetch('api/users', { credentials: 'include', redirect: 'error' })
       .then(response => response.text())
       .then(body => {
         if (body !== '') {
@@ -64,7 +64,7 @@ const Header = () => {
   }
 
   const message = user ?
-    <h2>Welcome, {user.name}!</h2> :
+    <h2>Welcome, {user.firstName}!</h2> :
     <p>Please log in to manage your Devices.</p> ;
 
   const handleClose = () => {

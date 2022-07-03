@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.util.HashSet;
 import java.util.Set;
@@ -28,6 +29,7 @@ public class UserService {
     UserDtoMapper userDtoMapper;
     UserDao userDao;
 
+
     public User signIn(OAuth2User oAuth2User) {
         User user = userDtoMapper.fromUserDto(oAuth2User);
         if (userDao.existsByEmail(user.getEmail())) return userDao.findByEmail(user.getEmail())
@@ -40,8 +42,8 @@ public class UserService {
         return user;
     }
 
-    public User signOut(OAuth2User oAuth2User) {
-        return null;
+    public void signOut(HttpServletRequest request) {
+        request.getSession(false).invalidate();
     }
 
     public User leave(OAuth2User oAuth2User) {

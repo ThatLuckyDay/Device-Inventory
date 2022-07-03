@@ -8,7 +8,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
-import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 
@@ -51,7 +50,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                             request.getSession().setAttribute("error.message", exception.getMessage());
                             handler.onAuthenticationFailure(request, response, exception);
                         })
-                        .defaultSuccessUrl("http://localhost:3000")
+                        .defaultSuccessUrl("http://localhost:3000/")
                 );
     }
 

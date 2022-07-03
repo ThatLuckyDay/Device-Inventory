@@ -13,8 +13,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
-import java.util.Map;
 
 @Slf4j
 @RestController
@@ -25,15 +23,7 @@ public class UserController {
     UserService userService;
 
 
-    @GetMapping("/user")
-    @ResponseBody
-    public Map<String, Object> user(@AuthenticationPrincipal OAuth2User oAuth2User) {
-        if (oAuth2User == null) return null;
-        return Collections.singletonMap("name", oAuth2User.getAttribute("name"));
-    }
-
     @GetMapping("/error")
-    @ResponseBody
     public String error(HttpServletRequest request) {
         String message = (String) request.getSession().getAttribute("error.message");
         request.getSession().removeAttribute("error.message");
@@ -41,29 +31,14 @@ public class UserController {
     }
 
     @PostMapping(value = "/logout", produces = MediaType.APPLICATION_JSON_VALUE)
-    public User signOut(HttpServletRequest request, @AuthenticationPrincipal OAuth2User oAuth2User) {
-        request.getSession(false).invalidate();
-        return new User(
-                0,
-                oAuth2User.getAttribute("given_name"),
-                oAuth2User.getAttribute("family_name"),
-                oAuth2User.getAttribute("email"),
-                true,
-                null,
-                null
-        );
+    public void signOut(HttpServletRequest request) {
+        userService.signOut(request);
     }
 
-
-    @PostMapping(value = "/api/users", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
     public User signIn(@AuthenticationPrincipal OAuth2User oAuth2User) {
         return userService.signIn(oAuth2User);
     }
-
-//    @DeleteMapping(value = "/api/sessions", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public User signOut(@AuthenticationPrincipal OAuth2User oAuth2User) {
-//        return userService.signOut(oAuth2User);
-//    }
 
     @DeleteMapping(value = "/api/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
     public User leave(@AuthenticationPrincipal OAuth2User oAuth2User) {
