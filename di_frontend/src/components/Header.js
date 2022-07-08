@@ -14,21 +14,33 @@ import FormGroup from '@mui/material/FormGroup';
 
 
 
-const Header = ({value, onClick}) => {
-
+const Header = (props) => {
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <LoginLogout value = {value} onClick = {onClick} />
+      <LoginLogout cookies = {props.cookies} removeCookie = {props.removeCookie} auth = {props.auth}
+        setAuth = {props.setAuth}
+      />
     </Box>
   );
 }
 
-const LoginLogout = ({value, onClick}) => {
-  const [auth, setAuth] = useState(false);
+const LoginLogout = (props) => {
 
   const handleChange = (event) => {
-    if (!auth)  login(setAuth);
-    else  logout(setAuth, value, onClick);
+    if (!props.auth)  {
+      let port = (window.location.port ? ':' + window.location.port : '');
+      if (port === ':3000') port = ':8080';
+      window.location.href = `//${window.location.hostname}${port}/oauth2/authorization/google`;
+    } else  {
+      fetch('/api/logout', {
+        method: 'POST', credentials: 'include',
+        headers: { 'X-XSRF-TOKEN': props.cookies['XSRF-TOKEN'] }
+      })
+      .then(response => {
+        props.removeCookie('XSRF-TOKEN');
+        props.setAuth(false);
+      });
+    }
   };
 
   return (
@@ -36,35 +48,15 @@ const LoginLogout = ({value, onClick}) => {
       <FormControlLabel
         control={
           <Switch
-            checked={auth}
+            checked={props.auth}
             onChange={handleChange}
             aria-label="login switch"
           />
         }
-        label={auth ? 'Logout' : 'Login'}
+        label={props.auth ? 'Logout' : 'Login'}
       />
     </FormGroup>
   );
-}
-
-const login = (setAuth) => {
-  let port = (window.location.port ? ':' + window.location.port : '');
-  if (port === ':3000') {
-    port = ':8080';
-  }
-  window.location.href = `//${window.location.hostname}${port}/oauth2/authorization/google`;
-  setAuth(true);
-}
-
-const logout = (setAuth, cookies, deleteCookie) => {
-  fetch('/api/logout', {
-    method: 'POST', credentials: 'include',
-    headers: { 'X-XSRF-TOKEN': cookies['XSRF-TOKEN'] }
-  })
-  .then(response => {
-    deleteCookie('XSRF-TOKEN');
-    setAuth(false);
-  });
 }
 
 export default Header;
