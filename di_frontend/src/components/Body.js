@@ -2,13 +2,10 @@ import React, { useState, useEffect } from 'react';
 
 
 const Body = (props) => {
-}
-
-const Authorize = () => {
-  const [user, setUser] = useState(false);
+  let message = props.user ? `Привет, ${props.user.firstName}!` : 'Пожалуйста зарегистрируйтесь';
   return (
-    <h1> {user} . Test </h1>
+    <h1> {message} </h1>
   );
 }
 
-export default { Body, Authorize };
+export default Body;

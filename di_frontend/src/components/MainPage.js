@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Header from './Header.js';
 import Body from './Body.js';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 
 
@@ -10,7 +9,6 @@ const MainPage = () => {
   const [cookies, removeCookie] = useCookies(['XSRF-TOKEN']);
   const [user, setUser] = useState(false);
   const [auth, setAuth] = useState(false);
-
   useEffect(() => {
     if (!auth) setUser(null);
     fetch('/api/users', {
@@ -24,16 +22,12 @@ const MainPage = () => {
           setAuth(true);
         }
       });
-  }, [setUser, setAuth])
-
+  }, [setUser, setAuth, auth])
   return (
-    <Router>
-      <Routes>
-        <Route exact path="/" element = {
-          <Header cookies = {cookies} removeCookie = {removeCookie} auth = {auth} setAuth = {setAuth} />
-        } />
-      </Routes>
-    </Router>
+    <div>
+      <Header cookies = {cookies} removeCookie = {removeCookie} auth = {auth} setAuth = {setAuth} />
+      <Body cookies = {cookies} removeCookie = {removeCookie} user = {user} setUser = {setUser} />
+    </div>
   );
 }
 

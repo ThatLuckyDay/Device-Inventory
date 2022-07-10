@@ -1,31 +1,65 @@
-import { useState } from 'react';
-//import AppBar from '@mui/material/AppBar';
+import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
-//import Toolbar from '@mui/material/Toolbar';
-//import Typography from '@mui/material/Typography';
-//import IconButton from '@mui/material/IconButton';
-//import MenuIcon from '@mui/icons-material/Menu';
-//import AccountCircle from '@mui/icons-material/AccountCircle';
+import Toolbar from '@mui/material/Toolbar';
+import Container from '@mui/material/Container';
 import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
-//import MenuItem from '@mui/material/MenuItem';
-//import Menu from '@mui/material/Menu';
+import Button from '@mui/material/Button';
+import { useNavigate } from 'react-router-dom';
 
 
+const pages = ['PROFILE', 'DEVICES', 'SCAN QR'];
 
 const Header = (props) => {
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <LoginLogout cookies = {props.cookies} removeCookie = {props.removeCookie} auth = {props.auth}
-        setAuth = {props.setAuth}
-      />
+      <AppBar position="static">
+        <ContainerForm cookies = {props.cookies} removeCookie = {props.removeCookie} auth = {props.auth}
+          setAuth = {props.setAuth}
+        />
+      </AppBar>
+    </Box>
+  );
+}
+
+const ContainerForm = (props) => {
+  return (
+    <Container maxWidth="xl" >
+      <Toolbar disableGutters>
+        <PagesForm />
+        <LoginLogout cookies = {props.cookies} removeCookie = {props.removeCookie} auth = {props.auth}
+          setAuth = {props.setAuth} sx = {{ mr : 2 }}
+        />
+      </Toolbar>
+    </Container>
+  );
+}
+
+const PagesForm = () => {
+  const navigate = useNavigate();
+  const handleRedirect = (event) => {
+    let ref = event.currentTarget.innerText;
+    if (ref === pages[0]) navigate('/api/accounts');
+    if (ref === pages[1]) navigate('/api/devices');
+    if (ref === pages[2]) navigate('/api/scanner');
+  }
+  return (
+    <Box sx={{ flexGrow: 1, display: 'inline-flex', flexWrap: 'wrap' }}>
+      { pages.map((page) => (
+      <Button
+        key={page}
+        onClick={handleRedirect}
+        sx={{ my: 2, color: 'white', display: 'block' }}
+      >
+      {page}
+      </Button>
+      ))}
     </Box>
   );
 }
 
 const LoginLogout = (props) => {
-
   const handleChange = (event) => {
     if (!props.auth)  {
       let port = (window.location.port ? ':' + window.location.port : '');
@@ -42,7 +76,6 @@ const LoginLogout = (props) => {
       });
     }
   };
-
   return (
     <FormGroup>
       <FormControlLabel
@@ -51,9 +84,10 @@ const LoginLogout = (props) => {
             checked={props.auth}
             onChange={handleChange}
             aria-label="login switch"
+            color="default"
           />
         }
-        label={props.auth ? 'Logout' : 'Login'}
+        label={ props.auth ? 'Logout' : 'Login' }
       />
     </FormGroup>
   );
