@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Header from './Header.js';
-import Body from './Body.js';
+import { SayHi } from './Body.js';
 import { useCookies } from 'react-cookie';
-
 
 
 const MainPage = () => {
@@ -13,7 +12,10 @@ const MainPage = () => {
     if (!auth) setUser(null);
     fetch('/api/users', {
       credentials: 'include',
-      crossDomain: true
+      headers : {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
     })
       .then(response => response.text())
       .then(body => {
@@ -22,11 +24,11 @@ const MainPage = () => {
           setAuth(true);
         }
       });
-  }, [setUser, setAuth, auth])
+  }, [setUser, setAuth, auth] );
   return (
     <div>
       <Header cookies = {cookies} removeCookie = {removeCookie} auth = {auth} setAuth = {setAuth} />
-      <Body cookies = {cookies} removeCookie = {removeCookie} user = {user} setUser = {setUser} />
+      <SayHi cookies = {cookies} removeCookie = {removeCookie} user = {user} setUser = {setUser} />
     </div>
   );
 }

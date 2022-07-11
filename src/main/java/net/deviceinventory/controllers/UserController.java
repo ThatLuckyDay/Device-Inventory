@@ -30,7 +30,7 @@ public class UserController {
         return message;
     }
 
-    @PostMapping(value = "/logout", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
     public void signOut(HttpServletRequest request) {
         userService.signOut(request);
     }

@@ -66,7 +66,7 @@ const LoginLogout = (props) => {
       if (port === ':3000') port = ':8080';
       window.location.href = `//${window.location.hostname}${port}/oauth2/authorization/google`;
     } else  {
-      fetch('/api/logout', {
+      fetch('/api/users', {
         method: 'POST', credentials: 'include',
         headers: { 'X-XSRF-TOKEN': props.cookies['XSRF-TOKEN'] }
       })
