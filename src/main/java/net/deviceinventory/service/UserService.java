@@ -5,8 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import net.deviceinventory.dao.DeviceDao;
 import net.deviceinventory.dao.UserDao;
 import net.deviceinventory.dto.mappers.UserDtoMapper;
+import net.deviceinventory.model.Device;
 import net.deviceinventory.model.Role;
 import net.deviceinventory.model.RoleType;
 import net.deviceinventory.model.User;
@@ -16,7 +18,9 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -28,6 +32,7 @@ import java.util.Set;
 public class UserService {
     UserDtoMapper userDtoMapper;
     UserDao userDao;
+    DeviceDao deviceDao;
 
 
     public User signIn(OAuth2User oAuth2User) {
@@ -52,6 +57,12 @@ public class UserService {
         user.setActive(false);
         userDao.save(user);
         return user;
+    }
+
+    public List<Device> getDevices() {
+        List<Device> devices = new ArrayList<>();
+        deviceDao.findAll().forEach(devices::add);
+        return devices;
     }
 
 }

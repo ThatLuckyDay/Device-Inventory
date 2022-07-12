@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -7,16 +8,32 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
+import { useCookies } from 'react-cookie';
 
 
 const pages = ['PROFILE', 'DEVICES', 'SCAN QR'];
 
-const Header = (props) => {
+const Header = () => {
+  const [cookies, removeCookie] = useCookies(['XSRF-TOKEN']);
+  const [auth, setAuth] = useState(false);
+  useEffect(() => {
+    fetch('/api/users', {
+      credentials: 'include',
+      headers : {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+    })
+      .then(response => response.text())
+      .then(body => {
+        if (body !== '') setAuth(true);
+      });
+  }, [setAuth] );
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
-        <ContainerForm cookies = {props.cookies} removeCookie = {props.removeCookie} auth = {props.auth}
-          setAuth = {props.setAuth}
+        <ContainerForm cookies = {cookies} removeCookie = {removeCookie}
+          auth = {auth} setAuth = {setAuth}
         />
       </AppBar>
     </Box>
@@ -28,8 +45,8 @@ const ContainerForm = (props) => {
     <Container maxWidth="xl" >
       <Toolbar disableGutters>
         <PagesForm />
-        <LoginLogout cookies = {props.cookies} removeCookie = {props.removeCookie} auth = {props.auth}
-          setAuth = {props.setAuth} sx = {{ mr : 2 }}
+        <LoginLogout cookies = {props.cookies} removeCookie = {props.removeCookie}
+          auth = {props.auth} setAuth = {props.setAuth}
         />
       </Toolbar>
     </Container>
@@ -40,9 +57,9 @@ const PagesForm = () => {
   const navigate = useNavigate();
   const handleRedirect = (event) => {
     let ref = event.currentTarget.innerText;
-    if (ref === pages[0]) navigate('/api/accounts');
-    if (ref === pages[1]) navigate('/api/devices');
-    if (ref === pages[2]) navigate('/api/scanner');
+    if (ref === pages[0]) navigate('/accounts');
+    if (ref === pages[1]) navigate('/devices');
+    if (ref === pages[2]) navigate('/scanner');
   }
   return (
     <Box sx={{ flexGrow: 1, display: 'inline-flex', flexWrap: 'wrap' }}>

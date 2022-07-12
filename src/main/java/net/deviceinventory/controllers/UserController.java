@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import net.deviceinventory.model.Device;
 import net.deviceinventory.model.User;
 import net.deviceinventory.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -40,7 +42,7 @@ public class UserController {
         return userService.signIn(oAuth2User);
     }
 
-    @DeleteMapping(value = "/api/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
     public User leave(@AuthenticationPrincipal OAuth2User oAuth2User) {
         return userService.leave(oAuth2User);
     }
@@ -56,8 +58,8 @@ public class UserController {
     }
 
     @GetMapping(value = "/devices", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String listDevices() {
-        return null;
+    public List<Device> listDevices() {
+        return userService.getDevices();
     }
 
     @GetMapping(value = "/devices/{devicesNumber}", produces = MediaType.APPLICATION_JSON_VALUE)

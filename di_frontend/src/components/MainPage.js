@@ -1,15 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import Header from './Header.js';
-import { SayHi } from './Body.js';
+import React, { useState, useEffect } from 'react';
 import { useCookies } from 'react-cookie';
+import Header from './Header.js';
+
 
 
 const MainPage = () => {
-  const [cookies, removeCookie] = useCookies(['XSRF-TOKEN']);
-  const [user, setUser] = useState(false);
-  const [auth, setAuth] = useState(false);
+  return (
+    <div>
+      <Header/>
+      <SayHi />
+    </div>
+  );
+}
+
+const SayHi = () => {
+  const [cookies] = useCookies(['XSRF-TOKEN']);
+  const [user, setUser] = useState(null);
   useEffect(() => {
-    if (!auth) setUser(null);
     fetch('/api/users', {
       credentials: 'include',
       headers : {
@@ -19,17 +26,13 @@ const MainPage = () => {
     })
       .then(response => response.text())
       .then(body => {
-        if (body !== '') {
-          setUser(JSON.parse(body));
-          setAuth(true);
-        }
+        if (body !== '') setUser(JSON.parse(body));
       });
-  }, [setUser, setAuth, auth] );
+  }, [setUser] );
+  if (cookies['XSRF-TOKEN'] === 'undefined' && user !== null) setUser(null);
+  let message = user ? `Привет, ${user.firstName}!` : 'Пожалуйста зарегистрируйтесь';
   return (
-    <div>
-      <Header cookies = {cookies} removeCookie = {removeCookie} auth = {auth} setAuth = {setAuth} />
-      <SayHi cookies = {cookies} removeCookie = {removeCookie} user = {user} setUser = {setUser} />
-    </div>
+    <h1> {message} </h1>
   );
 }
 
