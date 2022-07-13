@@ -65,4 +65,7 @@ public class UserService {
         return devices;
     }
 
+    public User viewAccount(OAuth2User oAuth2User) {
+        return userDtoMapper.fromUserDto(oAuth2User);
+    }
 }

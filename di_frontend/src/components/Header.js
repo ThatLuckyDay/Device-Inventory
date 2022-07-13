@@ -16,6 +16,7 @@ const pages = ['PROFILE', 'DEVICES', 'SCAN QR'];
 const Header = () => {
   const [cookies, removeCookie] = useCookies(['XSRF-TOKEN']);
   const [auth, setAuth] = useState(false);
+  const navigate = useNavigate();
   useEffect(() => {
     fetch('/api/users', {
       credentials: 'include',
@@ -27,6 +28,7 @@ const Header = () => {
       .then(response => response.text())
       .then(body => {
         if (body !== '') setAuth(true);
+        else navigate('/');
       });
   }, [setAuth] );
   return (
@@ -44,7 +46,7 @@ const ContainerForm = (props) => {
   return (
     <Container maxWidth="xl" >
       <Toolbar disableGutters>
-        <PagesForm />
+        <PagesForm/>
         <LoginLogout cookies = {props.cookies} removeCookie = {props.removeCookie}
           auth = {props.auth} setAuth = {props.setAuth}
         />

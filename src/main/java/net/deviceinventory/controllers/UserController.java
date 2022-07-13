@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 import java.util.List;
 
 @Slf4j
@@ -48,13 +49,8 @@ public class UserController {
     }
 
     @GetMapping(value = "/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String viewAccount() {
-        return null;
-    }
-
-    @PutMapping(value = "/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String editAccount() {
-        return null;
+    public User viewAccount(@AuthenticationPrincipal OAuth2User oAuth2User, HttpServletRequest request) {
+        return userService.viewAccount(oAuth2User);
     }
 
     @GetMapping(value = "/devices", produces = MediaType.APPLICATION_JSON_VALUE)

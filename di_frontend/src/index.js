@@ -2,6 +2,7 @@ import React from 'react';
 import * as ReactDOMClient from 'react-dom/client';
 import MainPage from './components/MainPage';
 import DevicesPage from './components/DevicesPage';
+import ProfilePage from './components/ProfilePage';
 import { CookiesProvider } from 'react-cookie';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -16,6 +17,7 @@ root.render(
         <Routes>
           <Route exact path="/" element={ <MainPage/> } />
           <Route exact path="/devices" element={ <DevicesPage/> } />
+          <Route exact path="/accounts" element={ <ProfilePage/> } />
         </Routes>
       </Router>
     </CookiesProvider>
