@@ -21,7 +21,10 @@ public class Device {
     long id;
 
     @Column(nullable = false)
-    String deviceName;
+    String name;
+
+    @Column(nullable = false)
+    String QRCode;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")

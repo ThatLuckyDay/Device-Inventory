@@ -58,7 +58,7 @@ public class UserController {
         return userService.getDevices();
     }
 
-    @GetMapping(value = "/devices/{devicesNumber}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/devices/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String findDevice() {
         return null;
     }

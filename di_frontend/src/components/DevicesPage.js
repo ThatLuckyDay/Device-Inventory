@@ -20,35 +20,29 @@ const margin = {
 }
 
 const Devices = () => {
+  const [cookies] = useCookies(['XSRF-TOKEN']);
   const [devices, setDevices] = useState([]);
   useEffect(() => {
     fetch('/api/devices', {
       credentials: 'include',
       headers : {
+        'X-XSRF-TOKEN': cookies['XSRF-TOKEN'],
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       }
     })
       .then(response => response.json())
       .then(data => setDevices(data))
-  }, [] );
-  const remove = async (id) => {
-  }
+  }, [cookies, setDevices] );
+  const remove = async (id) => {  }
   const deviceList = devices.map(device => {
-    const userDevice = `${device.user.firstName || ''} ${device.user.lastName || ''}`;
+    const userDevice = device.user ? `${device.user.firstName || ''} ${device.user.lastName || ''}` : '';
     return <tr key={device.id}>
-      <td style={{whiteSpace: 'nowrap'}}>{device.deviceName}</td>
+      <td style={{whiteSpace: 'nowrap'}}>{device.name}</td>
       <td>{userDevice}</td>
-      <td>{device.events.map(event => {
-        return <div key={event.id}>{new Intl.DateTimeFormat('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: '2-digit'
-        }).format(new Date(event.date))}: {event.title}</div>
-      })}</td>
       <td>
         <ButtonGroup>
-          <Button size="sm" color="primary" tag={Link} to={"/" + device.id}>Edit</Button>
+          <Button size="sm" color="primary" tag={Link} to={"/devices/" + device.id}>Edit</Button>
           <Button size="sm" color="danger" onClick={() => remove(device.id)}>Delete</Button>
         </ButtonGroup>
       </td>
@@ -58,7 +52,7 @@ const Devices = () => {
     <div style={margin}>
       <Container fluid>
         <div className="float-end">
-          <Button color="success" tag={Link} to="/">Add Device</Button>
+          <Button color="success" tag={Link} to="/devices/new">Add Device</Button>
         </div>
         <h3>Devices</h3>
         <Table className="mt-4">

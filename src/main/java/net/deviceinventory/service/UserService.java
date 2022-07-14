@@ -66,6 +66,7 @@ public class UserService {
     }
 
     public User viewAccount(OAuth2User oAuth2User) {
-        return userDtoMapper.fromUserDto(oAuth2User);
+        User user = userDtoMapper.fromUserDto(oAuth2User);
+        return userDao.findByEmail(user.getEmail()).orElseThrow(() -> new RuntimeException("500"));
     }
 }

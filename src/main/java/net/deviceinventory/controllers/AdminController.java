@@ -4,15 +4,12 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import net.deviceinventory.model.Device;
 import net.deviceinventory.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -23,13 +20,18 @@ public class AdminController {
     AdminService adminService;
 
     @PostMapping(value = "/devices", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String addDevice() {
-        return null;
+    public Device addDevice(@RequestBody Device device) {
+        return adminService.addDevice(device);
     }
 
-    @DeleteMapping(value = "/devices/{devicesNumber}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String deleteDevice(@PathVariable("devicesNumber") String devicesNumber) {
-        return null;
+    @PostMapping(value = "/devices/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Device editDevice(@RequestBody Device device) {
+        return adminService.editDevice(device);
+    }
+
+    @DeleteMapping(value = "/devices/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Device deleteDevice(@PathVariable("id") Long id) {
+        return adminService.deleteDevice(id);
     }
 
 }

@@ -5,8 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import net.deviceinventory.dao.DeviceDao;
 import net.deviceinventory.dao.UserDao;
 import net.deviceinventory.dto.mappers.UserDtoMapper;
+import net.deviceinventory.model.Device;
 import net.deviceinventory.model.Role;
 import net.deviceinventory.model.RoleType;
 import net.deviceinventory.model.User;
@@ -26,6 +28,7 @@ import java.util.Set;
 public class AdminService {
     UserDtoMapper userDtoMapper;
     UserDao userDao;
+    DeviceDao deviceDao;
 
 
     public User appointAdmin(User user) {
@@ -38,5 +41,17 @@ public class AdminService {
         return newAdmin;
     }
 
+    public Device addDevice(Device device) {
+        return deviceDao.save(device);
+    }
 
+    public Device editDevice(Device device) {
+        return deviceDao.save(device);
+    }
+
+    public Device deleteDevice(Long id) {
+        Device device = deviceDao.findById(id).orElseThrow(() -> new RuntimeException("Device not found"));
+        deviceDao.deleteById(id);
+        return device;
+    }
 }
