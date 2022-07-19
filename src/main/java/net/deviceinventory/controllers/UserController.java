@@ -43,11 +43,6 @@ public class UserController {
         return userService.signIn(oAuth2User);
     }
 
-    @DeleteMapping(value = "/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
-    public User leave(@AuthenticationPrincipal OAuth2User oAuth2User) {
-        return userService.leave(oAuth2User);
-    }
-
     @GetMapping(value = "/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
     public User viewAccount(@AuthenticationPrincipal OAuth2User oAuth2User, HttpServletRequest request) {
         return userService.viewAccount(oAuth2User);
@@ -59,8 +54,8 @@ public class UserController {
     }
 
     @GetMapping(value = "/devices/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String findDevice() {
-        return null;
+    public Device findDevice(@PathVariable Long id) {
+        return userService.getDevice(id);
     }
 
     @PostMapping(value = "/devices/{devicesNumber}", produces = MediaType.APPLICATION_JSON_VALUE)

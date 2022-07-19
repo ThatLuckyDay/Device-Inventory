@@ -52,7 +52,7 @@ const CreateDevicePage = () => {
               onChange={handleChange} autoComplete="name"/>
           </FormGroup>
           <FormGroup>
-            <Label for="QRCode">QRCode</Label>
+            <Label for="QRCode">QR Code</Label>
             <Input type="text" name="qrcode" id="QRCode" value={device.qrcode || ''}
               onChange={handleChange} autoComplete="QRCode"/>
           </FormGroup>

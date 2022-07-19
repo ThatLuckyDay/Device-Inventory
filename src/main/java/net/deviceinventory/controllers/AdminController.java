@@ -24,7 +24,7 @@ public class AdminController {
         return adminService.addDevice(device);
     }
 
-    @PostMapping(value = "/devices/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/devices/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Device editDevice(@RequestBody Device device) {
         return adminService.editDevice(device);
     }

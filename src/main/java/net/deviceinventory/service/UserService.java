@@ -51,14 +51,6 @@ public class UserService {
         request.getSession(false).invalidate();
     }
 
-    public User leave(OAuth2User oAuth2User) {
-        User user = userDtoMapper.fromUserDto(oAuth2User);
-        if (!userDao.existsByEmail(user.getEmail())) throw new RuntimeException("User not found");
-        user.setActive(false);
-        userDao.save(user);
-        return user;
-    }
-
     public List<Device> getDevices() {
         List<Device> devices = new ArrayList<>();
         deviceDao.findAll().forEach(devices::add);
@@ -68,5 +60,9 @@ public class UserService {
     public User viewAccount(OAuth2User oAuth2User) {
         User user = userDtoMapper.fromUserDto(oAuth2User);
         return userDao.findByEmail(user.getEmail()).orElseThrow(() -> new RuntimeException("500"));
+    }
+
+    public Device getDevice(Long id) {
+        return deviceDao.findById(id).orElseThrow(() -> new RuntimeException("Device not found"));
     }
 }

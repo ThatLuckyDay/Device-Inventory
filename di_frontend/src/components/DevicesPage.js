@@ -34,11 +34,25 @@ const Devices = () => {
       .then(response => response.json())
       .then(data => setDevices(data))
   }, [cookies, setDevices] );
-  const remove = async (id) => {  }
+  const remove = async (id) => {
+    await fetch(`/api/devices/${id}`, {
+      credentials: 'include',
+      method: 'DELETE',
+      headers: {
+        'X-XSRF-TOKEN': cookies['XSRF-TOKEN'],
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    }).then(() => {
+      let updatedDevices = [...devices].filter(i => i.id !== id);
+      setDevices(updatedDevices);
+    });
+  }
   const deviceList = devices.map(device => {
     const userDevice = device.user ? `${device.user.firstName || ''} ${device.user.lastName || ''}` : '';
     return <tr key={device.id}>
       <td style={{whiteSpace: 'nowrap'}}>{device.name}</td>
+      <td style={{whiteSpace: 'nowrap'}}>{device.qrcode}</td>
       <td>{userDevice}</td>
       <td>
         <ButtonGroup>
@@ -59,6 +73,7 @@ const Devices = () => {
           <thead>
           <tr>
             <th width="20%">Name</th>
+            <th width="20%">QR</th>
             <th width="20%">Location</th>
           </tr>
           </thead>

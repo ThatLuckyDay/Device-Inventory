@@ -74,7 +74,12 @@ const Profile = () => {
     <TextField
       id="filled-read-only-input"
       label="Role"
-      defaultValue={profile.role}
+      defaultValue={
+        profile.role.map( i => {
+          let roleText = i.name.replace('ROLE_', '').toLowerCase();
+          return roleText[0].toUpperCase() + roleText.slice(1);
+        }
+      )}
       InputProps={{
         readOnly: true,
       }}

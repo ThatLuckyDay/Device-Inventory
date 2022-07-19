@@ -79,6 +79,7 @@ const PagesForm = () => {
 }
 
 const LoginLogout = (props) => {
+  const navigate = useNavigate();
   const handleChange = (event) => {
     if (!props.auth)  {
       let port = (window.location.port ? ':' + window.location.port : '');
@@ -92,6 +93,7 @@ const LoginLogout = (props) => {
       .then(response => {
         props.removeCookie('XSRF-TOKEN');
         props.setAuth(false);
+        navigate('/');
       });
     }
   };
