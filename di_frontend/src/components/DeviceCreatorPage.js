@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button, Container, Form, FormGroup, Input, Label } from 'reactstrap';
 import Header from './Header';
 
-const CreateDevicePage = () => {
+
+const DeviceCreatorPage = () => {
   const initialFormState = {
     name: '',
     qrcode: ''
@@ -66,4 +67,4 @@ const CreateDevicePage = () => {
   );
 }
 
-export default CreateDevicePage;
+export default DeviceCreatorPage;

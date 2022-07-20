@@ -14,7 +14,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.security.Principal;
 import java.util.List;
 
 @Slf4j
@@ -58,7 +57,7 @@ public class UserController {
         return userService.getDevice(id);
     }
 
-    @PostMapping(value = "/devices/{devicesNumber}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/devices/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String takeDevice() {
         return null;
     }
