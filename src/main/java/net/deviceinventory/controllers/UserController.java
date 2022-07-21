@@ -57,9 +57,9 @@ public class UserController {
         return userService.getDevice(id);
     }
 
-    @PostMapping(value = "/devices/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String takeDevice() {
-        return null;
+    @PostMapping(value = "/owners", produces = MediaType.APPLICATION_JSON_VALUE)
+    public User takeDevice(@AuthenticationPrincipal OAuth2User oAuth2User, @RequestBody Device device) {
+        return userService.takeDevice(device, oAuth2User);
     }
 
 }

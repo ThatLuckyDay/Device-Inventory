@@ -18,10 +18,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @NoArgsConstructor
@@ -64,5 +61,19 @@ public class UserService {
 
     public Device getDevice(Long id) {
         return deviceDao.findById(id).orElseThrow(() -> new RuntimeException("Device not found"));
+    }
+
+    public User takeDevice(Device device, OAuth2User oAuth2User) {
+        Optional<Device> deviceData = deviceDao.findByQRCode(device.getQRCode());
+        if (deviceData.isEmpty()) throw  new RuntimeException("Device not found");
+        if (deviceData.get().getUser() != null)
+            throw  new RuntimeException(String.format("The device is being used by user %s ",
+                    deviceData.get().getUser().getEmail()));
+        User user = userDtoMapper.fromUserDto(oAuth2User);
+        User userData = userDao.findByEmail(user.getEmail()).orElseThrow(() -> new RuntimeException("500"));
+        deviceData.get().setUser(userData);
+        deviceDao.save(deviceData.get());
+        user = userDao.findByEmail(user.getEmail()).orElseThrow(() -> new RuntimeException("500"));
+        return userDao.findByEmail(user.getEmail()).orElseThrow(() -> new RuntimeException("500"));
     }
 }
