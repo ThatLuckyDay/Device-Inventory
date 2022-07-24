@@ -9,23 +9,27 @@ import net.deviceinventory.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Slf4j
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 @RequestMapping(value = "/api")
+@Validated
 public class AdminController {
     AdminService adminService;
 
     @PostMapping(value = "/devices", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Device addDevice(@RequestBody Device device) {
+    public Device addDevice(@Valid @RequestBody Device device) {
         return adminService.addDevice(device);
     }
 
     @PutMapping(value = "/devices/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Device editDevice(@RequestBody Device device) {
+    public Device editDevice(@Valid @RequestBody Device device) {
         return adminService.editDevice(device);
     }
 

@@ -12,9 +12,8 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class LoginRequest {
-    @NotBlank
-    String username;
-    @NotBlank
-    String password;
+public class DeviceRequest {
+    String name;
+    @NotBlank(message = "EMPTY_FIELD")
+    String QRCode;
 }

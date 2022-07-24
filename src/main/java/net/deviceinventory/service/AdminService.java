@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import net.deviceinventory.dao.DeviceDao;
 import net.deviceinventory.dao.UserDao;
 import net.deviceinventory.dto.mappers.UserDtoMapper;
+import net.deviceinventory.exceptions.ErrorCode;
+import net.deviceinventory.exceptions.ServerException;
 import net.deviceinventory.model.Device;
 import net.deviceinventory.model.Role;
 import net.deviceinventory.model.RoleType;
@@ -43,7 +45,9 @@ public class AdminService {
     }
 
     public Device addDevice(Device device) {
-        if (deviceDao.existsByQRCode(device.getQRCode())) throw new RuntimeException("QR Code already exists");
+        Optional<Device> deviceByQR = deviceDao.findByQRCode(device.getQRCode());
+        if (deviceByQR.isPresent())
+            throw new ServerException(ErrorCode.SERVER_ERROR, String.valueOf(deviceByQR.get().getId()));
         return deviceDao.save(device);
     }
 
@@ -51,13 +55,14 @@ public class AdminService {
         Optional<Device> deviceByQR = deviceDao.findByQRCode(device.getQRCode());
         if (deviceByQR.isPresent())
             if (deviceByQR.get().getId() != device.getId())
-                throw new RuntimeException(String.format("QR Code already exists by Device with Id = %d",
-                        deviceByQR.get().getId()));
+                throw new ServerException(ErrorCode.SERVER_ERROR, String.valueOf(deviceByQR.get().getId()));
         return deviceDao.save(device);
     }
 
     public Device deleteDevice(Long id) {
-        Device device = deviceDao.findById(id).orElseThrow(() -> new RuntimeException("Device not found"));
+        Device device = deviceDao
+                .findById(id)
+                .orElseThrow(() -> new ServerException(ErrorCode.DEVICE_NOT_FOUND, String.valueOf(id)));
         deviceDao.deleteById(id);
         return device;
     }

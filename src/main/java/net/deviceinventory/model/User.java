@@ -43,8 +43,5 @@ public class User {
     )
     Set<Role> role = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    List<Device> devices = new ArrayList<>();
-
 }
 

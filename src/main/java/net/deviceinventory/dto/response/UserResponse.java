@@ -5,8 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import net.deviceinventory.model.Device;
+import net.deviceinventory.model.Role;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -14,7 +17,9 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserResponse {
     long id;
-    String username;
+    String firstName;
+    String lastName;
     String email;
-    List<String> roles;
+    Set<Role> roles;
+    List<Device> devices;
 }

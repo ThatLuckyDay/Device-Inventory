@@ -8,6 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import net.deviceinventory.dao.DeviceDao;
 import net.deviceinventory.dao.UserDao;
 import net.deviceinventory.dto.mappers.UserDtoMapper;
+import net.deviceinventory.dto.request.DeviceRequest;
+import net.deviceinventory.dto.response.UserResponse;
+import net.deviceinventory.exceptions.ErrorCode;
+import net.deviceinventory.exceptions.ServerException;
 import net.deviceinventory.model.Device;
 import net.deviceinventory.model.Role;
 import net.deviceinventory.model.RoleType;
@@ -35,7 +39,7 @@ public class UserService {
     public User signIn(OAuth2User oAuth2User) {
         User user = userDtoMapper.fromUserDto(oAuth2User);
         if (userDao.existsByEmail(user.getEmail())) return userDao.findByEmail(user.getEmail())
-                .orElseThrow(() -> new RuntimeException("500"));
+                .orElseThrow(() -> new ServerException(ErrorCode.SERVER_ERROR));
         Set<Role> roles = new HashSet<>();
         roles.add(new Role(0, RoleType.ROLE_USER));
         user.setRole(roles);
@@ -54,26 +58,36 @@ public class UserService {
         return devices;
     }
 
-    public User viewAccount(OAuth2User oAuth2User) {
+    public UserResponse viewAccount(OAuth2User oAuth2User) {
         User user = userDtoMapper.fromUserDto(oAuth2User);
-        return userDao.findByEmail(user.getEmail()).orElseThrow(() -> new RuntimeException("500"));
+        User userData = userDao
+                .findByEmail(user.getEmail())
+                .orElseThrow(() -> new ServerException(ErrorCode.USER_NOT_FOUND, user.getEmail()));
+        List<Device> devices = deviceDao.findByUser(userData);
+        return userDtoMapper.toUserDto(userData, devices);
     }
 
     public Device getDevice(Long id) {
-        return deviceDao.findById(id).orElseThrow(() -> new RuntimeException("Device not found"));
+        return deviceDao
+                .findById(id)
+                .orElseThrow(() -> new ServerException(ErrorCode.DEVICE_NOT_FOUND, String.valueOf(id)));
     }
 
-    public User takeDevice(Device device, OAuth2User oAuth2User) {
+    public UserResponse takeDevice(DeviceRequest deviceDto, OAuth2User oAuth2User) {
+        Device device = userDtoMapper.fromDeviceDto(deviceDto);
         Optional<Device> deviceData = deviceDao.findByQRCode(device.getQRCode());
-        if (deviceData.isEmpty()) throw  new RuntimeException("Device not found");
+        if (deviceData.isEmpty()) throw new ServerException(ErrorCode.QR_CODE_NOT_EXIST, device.getQRCode());
         if (deviceData.get().getUser() != null)
-            throw  new RuntimeException(String.format("The device is being used by user %s ",
-                    deviceData.get().getUser().getEmail()));
+            throw new ServerException(ErrorCode.DEVICE_RESERVED, deviceData.get().getUser().getEmail());
         User user = userDtoMapper.fromUserDto(oAuth2User);
-        User userData = userDao.findByEmail(user.getEmail()).orElseThrow(() -> new RuntimeException("500"));
+        User userData = userDao
+                .findByEmail(user.getEmail())
+                .orElseThrow(() -> new ServerException(ErrorCode.USER_NOT_FOUND, user.getEmail()));
         deviceData.get().setUser(userData);
         deviceDao.save(deviceData.get());
-        user = userDao.findByEmail(user.getEmail()).orElseThrow(() -> new RuntimeException("500"));
-        return userDao.findByEmail(user.getEmail()).orElseThrow(() -> new RuntimeException("500"));
+        userData = userDao
+                .findByEmail(user.getEmail())
+                .orElseThrow(() -> new ServerException(ErrorCode.USER_NOT_FOUND, user.getEmail()));
+        return userDtoMapper.toUserDto(userData, deviceDao.findByUser(userData));
     }
 }

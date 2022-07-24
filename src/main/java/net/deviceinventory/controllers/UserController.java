@@ -4,6 +4,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import net.deviceinventory.dto.request.DeviceRequest;
+import net.deviceinventory.dto.response.UserResponse;
 import net.deviceinventory.model.Device;
 import net.deviceinventory.model.User;
 import net.deviceinventory.service.UserService;
@@ -11,9 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j
@@ -21,16 +25,9 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 @RequestMapping(value = "/api")
+@Validated
 public class UserController {
     UserService userService;
-
-
-    @GetMapping("/error")
-    public String error(HttpServletRequest request) {
-        String message = (String) request.getSession().getAttribute("error.message");
-        request.getSession().removeAttribute("error.message");
-        return message;
-    }
 
     @PostMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
     public void signOut(HttpServletRequest request) {
@@ -43,7 +40,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/accounts", produces = MediaType.APPLICATION_JSON_VALUE)
-    public User viewAccount(@AuthenticationPrincipal OAuth2User oAuth2User, HttpServletRequest request) {
+    public UserResponse viewAccount(@AuthenticationPrincipal OAuth2User oAuth2User) {
         return userService.viewAccount(oAuth2User);
     }
 
@@ -58,7 +55,8 @@ public class UserController {
     }
 
     @PostMapping(value = "/owners", produces = MediaType.APPLICATION_JSON_VALUE)
-    public User takeDevice(@AuthenticationPrincipal OAuth2User oAuth2User, @RequestBody Device device) {
+    public UserResponse takeDevice(@AuthenticationPrincipal OAuth2User oAuth2User,
+                                   @Valid @RequestBody DeviceRequest device) {
         return userService.takeDevice(device, oAuth2User);
     }
 
