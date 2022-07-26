@@ -1,14 +1,18 @@
 package net.deviceinventory.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.deviceinventory.model.Role;
+import net.deviceinventory.model.RoleType;
 import net.deviceinventory.model.User;
 import net.deviceinventory.service.DebugService;
+import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -16,13 +20,15 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import javax.servlet.http.Cookie;
+import java.util.Objects;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oauth2Login;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration
@@ -69,11 +75,72 @@ class UserControllerTest {
 
         User user = mapper.readValue(result.getResponse().getContentAsString(), User.class);
 
+        assertNotNull(user);
+
+        Role[] userRole = user.getRole().toArray(Role[]::new);
+
         assertAll(
                 () -> assertEquals("test@test.test", user.getEmail()),
                 () -> assertEquals("test", user.getFirstName()),
-                () -> assertEquals("test", user.getLastName())
+                () -> assertEquals("test", user.getLastName()),
+                () -> assertEquals(userRole.length, 1),
+                () -> assertEquals(userRole[0].getName(), RoleType.ROLE_USER)
         );
+    }
+
+    @Test
+    void signInEmptyUserTest() throws Exception {
+        mvc
+                .perform(get("/api/users")
+                        .with(oauth2Login()))
+                .andExpectAll(
+                        status().isBadRequest(),
+                        content().contentType(MediaType.APPLICATION_JSON)
+                );
+    }
+
+    @Test
+    void signInPermissionDeniedTest() throws Exception {
+        mvc
+                .perform(get("/api/users"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void signOutTest() throws Exception {
+        MvcResult mvcResult = mvc
+                .perform(get("/api/users")
+                        .with(oauth2Login()
+                                .attributes(a -> {
+                                    a.put("given_name", "test");
+                                    a.put("family_name", "test");
+                                    a.put("email", "test@test.test");
+                                })))
+                .andReturn();
+        Cookie token = mvcResult.getResponse().getCookie("XSRF-TOKEN");
+        mvc
+                .perform(post("/api/users")
+                        .with(r -> {
+                            oauth2Login();
+                            r.setContentType(ContentType.APPLICATION_JSON.toString());
+                            r.addHeader("Set-Cookie", mvcResult.getResponse().getHeaders("Set-Cookie"));
+                            r.addHeader("X-XSRF-TOKEN", Objects.requireNonNull(token).getValue());
+                            r.setCookies(token);
+                            return r;
+                        })
+                        .session((MockHttpSession) Objects.requireNonNull(mvcResult.getRequest().getSession())))
+                .andExpectAll(
+                        status().isOk(),
+                        cookie().doesNotExist("XSRF-TOKEN")
+                )
+                .andReturn();
+    }
+
+    @Test
+    void signOutPermissionDeniedTest() throws Exception {
+        mvc
+                .perform(post("/api/users"))
+                .andExpect(status().isForbidden());
     }
 
 
