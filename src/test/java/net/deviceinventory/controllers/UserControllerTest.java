@@ -1,6 +1,7 @@
 package net.deviceinventory.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.deviceinventory.dto.response.UserResponse;
 import net.deviceinventory.model.Role;
 import net.deviceinventory.model.RoleType;
 import net.deviceinventory.model.User;
@@ -121,14 +122,11 @@ class UserControllerTest {
         mvc
                 .perform(post("/api/users")
                         .with(r -> {
-                            oauth2Login();
-                            r.setContentType(ContentType.APPLICATION_JSON.toString());
-                            r.addHeader("Set-Cookie", mvcResult.getResponse().getHeaders("Set-Cookie"));
+                            r.setSession(Objects.requireNonNull(mvcResult.getRequest().getSession()));
                             r.addHeader("X-XSRF-TOKEN", Objects.requireNonNull(token).getValue());
                             r.setCookies(token);
                             return r;
-                        })
-                        .session((MockHttpSession) Objects.requireNonNull(mvcResult.getRequest().getSession())))
+                        }))
                 .andExpectAll(
                         status().isOk(),
                         cookie().doesNotExist("XSRF-TOKEN")
@@ -141,6 +139,47 @@ class UserControllerTest {
         mvc
                 .perform(post("/api/users"))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void viewAccountTest() throws Exception {
+        MvcResult mvcResult = mvc
+                .perform(get("/api/users")
+                        .with(oauth2Login()
+                                .attributes(a -> {
+                                    a.put("given_name", "test");
+                                    a.put("family_name", "test");
+                                    a.put("email", "test@test.test");
+                                })))
+                .andReturn();
+        Cookie token = mvcResult.getResponse().getCookie("XSRF-TOKEN");
+        MvcResult result = mvc
+                .perform(get("/api/accounts")
+                        .with(r -> {
+                            r.setSession(Objects.requireNonNull(mvcResult.getRequest().getSession()));
+                            r.addHeader("X-XSRF-TOKEN", Objects.requireNonNull(token).getValue());
+                            r.setCookies(token);
+                            return r;
+                        }))
+                .andExpectAll(
+                        status().isOk(),
+                        cookie().doesNotExist("XSRF-TOKEN")
+                )
+                .andReturn();
+
+        UserResponse user = mapper.readValue(result.getResponse().getContentAsString(), UserResponse.class);
+
+        assertNotNull(user);
+
+        Role[] userRole = user.getRoles().toArray(Role[]::new);
+
+        assertAll(
+                () -> assertEquals("test@test.test", user.getEmail()),
+                () -> assertEquals("test", user.getFirstName()),
+                () -> assertEquals("test", user.getLastName()),
+                () -> assertEquals(userRole.length, 1),
+                () -> assertEquals(userRole[0].getName(), RoleType.ROLE_USER)
+        );
     }
 
 
