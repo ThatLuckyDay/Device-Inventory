@@ -23,8 +23,7 @@ import java.util.Objects;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oauth2Login;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
@@ -109,6 +108,121 @@ class AdminControllerTest {
                 () -> assertEquals(device.getName(), responseDevice.getName()),
                 () -> assertEquals(device.getQRCode(), responseDevice.getQRCode()),
                 () -> assertNull(device.getUser())
+        );
+    }
+
+    @Test
+    void editDeviceTest() throws Exception {
+        Device device = new Device(
+                1,
+                "testDevice1",
+                "testQR1",
+                null
+        );
+
+        byte[] requestBody = mapper.writeValueAsBytes(device);
+
+        MvcResult deviceSavedResponse = mvc
+                .perform(post("/api/devices")
+                        .with(r -> {
+                            r.setSession(mockHttpSession);
+                            r.addHeader("X-XSRF-TOKEN", Objects.requireNonNull(token).getValue());
+                            r.setCookies(token);
+                            r.setContentType(MediaType.APPLICATION_JSON.toString());
+                            r.setContent(requestBody);
+                            return r;
+                        }))
+                .andExpectAll(
+                        status().isOk(),
+                        cookie().doesNotExist("XSRF-TOKEN")
+                )
+                .andReturn();
+
+        Device deviceSaved = mapper.readValue(deviceSavedResponse.getResponse().getContentAsString(), Device.class);
+
+        Device deviceEdited = new Device(
+                deviceSaved.getId(),
+                "testDevice2",
+                "testQR2",
+                null
+        );
+
+        byte[] requestBodyEdited = mapper.writeValueAsBytes(deviceEdited);
+
+        MvcResult resultResponse = mvc
+                .perform(put("/api/devices/" + deviceSaved.getId())
+                        .with(r -> {
+                            r.setSession(mockHttpSession);
+                            r.addHeader("X-XSRF-TOKEN", Objects.requireNonNull(token).getValue());
+                            r.setCookies(token);
+                            r.setContentType(MediaType.APPLICATION_JSON.toString());
+                            r.setContent(requestBodyEdited);
+                            return r;
+                        }))
+                .andExpectAll(
+                        status().isOk(),
+                        cookie().doesNotExist("XSRF-TOKEN")
+                )
+                .andReturn();
+
+        Device deviceResult = mapper.readValue(resultResponse.getResponse().getContentAsString(), Device.class);
+
+        assertAll(
+                () -> assertEquals(deviceEdited.getName(), deviceResult.getName()),
+                () -> assertEquals(deviceEdited.getQRCode(), deviceResult.getQRCode()),
+                () -> assertNull(deviceEdited.getUser())
+        );
+    }
+
+    @Test
+    void deleteDeviceTest() throws Exception {
+        Device device = new Device(
+                1,
+                "testDevice1",
+                "testQR1",
+                null
+        );
+
+        byte[] requestBody = mapper.writeValueAsBytes(device);
+
+        MvcResult deviceSavedResponse = mvc
+                .perform(post("/api/devices")
+                        .with(r -> {
+                            r.setSession(mockHttpSession);
+                            r.addHeader("X-XSRF-TOKEN", Objects.requireNonNull(token).getValue());
+                            r.setCookies(token);
+                            r.setContentType(MediaType.APPLICATION_JSON.toString());
+                            r.setContent(requestBody);
+                            return r;
+                        }))
+                .andExpectAll(
+                        status().isOk(),
+                        cookie().doesNotExist("XSRF-TOKEN")
+                )
+                .andReturn();
+
+        Device deviceSaved = mapper.readValue(deviceSavedResponse.getResponse().getContentAsString(), Device.class);
+
+        MvcResult resultResponse = mvc
+                .perform(delete("/api/devices/" + deviceSaved.getId())
+                        .with(r -> {
+                            r.setSession(mockHttpSession);
+                            r.addHeader("X-XSRF-TOKEN", Objects.requireNonNull(token).getValue());
+                            r.setCookies(token);
+                            return r;
+                        }))
+                .andExpectAll(
+                        status().isOk(),
+                        cookie().doesNotExist("XSRF-TOKEN")
+                )
+                .andReturn();
+
+        Device deviceResult = mapper.readValue(resultResponse.getResponse().getContentAsString(), Device.class);
+
+        assertAll(
+                () -> assertEquals(deviceSaved.getName(), deviceResult.getName()),
+                () -> assertEquals(deviceSaved.getQRCode(), deviceResult.getQRCode()),
+                () -> assertNull(deviceSaved.getUser())
         );
     }
 

@@ -47,7 +47,7 @@ public class AdminService {
     public Device addDevice(Device device) {
         Optional<Device> deviceByQR = deviceDao.findByQRCode(device.getQRCode());
         if (deviceByQR.isPresent())
-            throw new ServerException(ErrorCode.SERVER_ERROR, String.valueOf(deviceByQR.get().getId()));
+            throw new ServerException(ErrorCode.QR_CODE_EXIST, String.valueOf(deviceByQR.get().getId()));
         return deviceDao.save(device);
     }
 
@@ -55,7 +55,7 @@ public class AdminService {
         Optional<Device> deviceByQR = deviceDao.findByQRCode(device.getQRCode());
         if (deviceByQR.isPresent())
             if (deviceByQR.get().getId() != device.getId())
-                throw new ServerException(ErrorCode.SERVER_ERROR, String.valueOf(deviceByQR.get().getId()));
+                throw new ServerException(ErrorCode.QR_CODE_EXIST, String.valueOf(deviceByQR.get().getId()));
         return deviceDao.save(device);
     }
 
