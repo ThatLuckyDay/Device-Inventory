@@ -8,9 +8,9 @@ public enum ErrorCode {
     USER_NOT_FOUND("User with email %s not found"),
     UNDEFINED_ERROR("undefined", "%s"),
     DEVICE_RESERVED("The device is being used by user %s "),
-    QR_CODE_EXIST("QR Code already exists by Device with id = %d"),
-    QR_CODE_NOT_EXIST("Device with QR Code = %d not exist"),
-    DEVICE_NOT_FOUND("Device with id = %d not found");
+    QR_CODE_EXIST("QR Code already exists by Device with id = %s"),
+    QR_CODE_NOT_EXIST("Device with QR Code = %s not exist"),
+    DEVICE_NOT_FOUND("Device with id = %s not found");
 
 
     private String field;

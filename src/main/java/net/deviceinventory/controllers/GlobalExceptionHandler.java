@@ -50,7 +50,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     @ExceptionHandler(value = ServerException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ServerExceptionResponse handleBuscompanyServerException(ServerException ex) {
+    public ServerExceptionResponse handleApplicationServerException(ServerException ex) {
         final List<ErrorCode> violations = Stream.of(ex.getErrorCode())
                 .peek(errorCode -> {
                     errorCode.formatMessage(ex.getParams().toArray(String[]::new));

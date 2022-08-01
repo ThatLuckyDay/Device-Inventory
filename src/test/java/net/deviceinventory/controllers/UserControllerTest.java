@@ -2,6 +2,9 @@ package net.deviceinventory.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.deviceinventory.dto.response.UserResponse;
+import net.deviceinventory.exceptions.ErrorCode;
+import net.deviceinventory.exceptions.ServerException;
+import net.deviceinventory.exceptions.ServerExceptionResponse;
 import net.deviceinventory.model.Device;
 import net.deviceinventory.model.Role;
 import net.deviceinventory.model.RoleType;
@@ -140,7 +143,7 @@ class UserControllerTest {
     }
 
     @Test
-    void signInEmptyUserTest() throws Exception {
+    void signInFailEmptyUserTest() throws Exception {
         mvc
                 .perform(get("/api/users")
                         .with(oauth2Login()))
@@ -151,7 +154,7 @@ class UserControllerTest {
     }
 
     @Test
-    void signInPermissionDeniedTest() throws Exception {
+    void signInFailPermissionDeniedTest() throws Exception {
         mvc
                 .perform(get("/api/users"))
                 .andExpect(status().isUnauthorized());
@@ -185,7 +188,7 @@ class UserControllerTest {
     }
 
     @Test
-    void signOutPermissionDeniedTest() throws Exception {
+    void signOutFailPermissionDeniedTest() throws Exception {
         mvc
                 .perform(post("/api/users"))
                 .andExpect(status().isForbidden());
@@ -233,6 +236,13 @@ class UserControllerTest {
     }
 
     @Test
+    void viewAccountFailPermissionDeniedTest() throws Exception {
+        mvc
+                .perform(get("/api/accounts"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     void listDevices() throws Exception {
         MvcResult mvcResult = mvc
                 .perform(get("/api/users")
@@ -271,6 +281,13 @@ class UserControllerTest {
     }
 
     @Test
+    void listDevicesFailPermissionDeniedTest() throws Exception {
+        mvc
+                .perform(get("/api/devices"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     void findDevice() throws Exception {
         MvcResult mvcResult = mvc
                 .perform(get("/api/users")
@@ -305,6 +322,43 @@ class UserControllerTest {
                 () -> assertEquals(deviceFromDB.getName(), device.getName()),
                 () -> assertNull(device.getUser())
         );
+    }
+
+    @Test
+    void findDeviceFailPermissionDeniedTest() throws Exception {
+        mvc
+                .perform(get("/api/devices/" + deviceFromDB.getId()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void findDeviceFailNoSuchDevice() throws Exception {
+        MvcResult mvcResult = mvc
+                .perform(get("/api/users")
+                        .with(oauth2Login()
+                                .attributes(a -> {
+                                    a.put("given_name", "test");
+                                    a.put("family_name", "test");
+                                    a.put("email", "test@test.test");
+                                })))
+                .andReturn();
+        Cookie token = mvcResult.getResponse().getCookie("XSRF-TOKEN");
+        MvcResult result = mvc
+                .perform(get("/api/devices/" + deviceFromDB.getId() + 10)
+                        .with(r -> {
+                            r.setSession(Objects.requireNonNull(mvcResult.getRequest().getSession()));
+                            r.addHeader("X-XSRF-TOKEN", Objects.requireNonNull(token).getValue());
+                            r.setCookies(token);
+                            return r;
+                        }))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        ServerExceptionResponse exceptionResponse = mapper.readValue(
+                result.getResponse().getContentAsString(),
+                ServerExceptionResponse.class);
+
+        assertEquals(ErrorCode.DEVICE_NOT_FOUND, exceptionResponse.getErrors().get(0));
     }
 
     @Test
@@ -355,6 +409,117 @@ class UserControllerTest {
                 () -> assertEquals(userRole[0].getName(), RoleType.ROLE_USER),
                 () -> assertEquals(userResponse.getId(), userResponse.getDevices().get(0).getUser().getId())
         );
+    }
+
+    @Test
+    void takeDeviceFailPermissionDeniedTest() throws Exception {
+        mvc
+                .perform(post("/api/owners"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void takeDeviceFailNoSuchDevice() throws Exception {
+        MvcResult mvcResult = mvc
+                .perform(get("/api/users")
+                        .with(oauth2Login()
+                                .attributes(a -> {
+                                    a.put("given_name", "test");
+                                    a.put("family_name", "test");
+                                    a.put("email", "test@test.test");
+                                })))
+                .andReturn();
+        Cookie token = mvcResult.getResponse().getCookie("XSRF-TOKEN");
+
+        Device unknownDevice = new Device(
+                0,
+                "testDevice2",
+                "testQR2",
+                null
+        );
+
+        byte[] requestBody = mapper.writeValueAsBytes(unknownDevice);
+
+        MvcResult result = mvc
+                .perform(post("/api/owners")
+                        .with(r -> {
+                            oauth2Login();
+                            r.setSession(Objects.requireNonNull(mvcResult.getRequest().getSession()));
+                            r.addHeader("X-XSRF-TOKEN", Objects.requireNonNull(token).getValue());
+                            r.setCookies(token);
+                            r.setContentType(MediaType.APPLICATION_JSON.toString());
+                            r.setContent(requestBody);
+                            return r;
+                        }))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        ServerExceptionResponse exceptionResponse = mapper.readValue(
+                result.getResponse().getContentAsString(),
+                ServerExceptionResponse.class);
+
+        assertEquals(ErrorCode.QR_CODE_NOT_EXIST, exceptionResponse.getErrors().get(0));
+    }
+
+    @Test
+    void takeDeviceFailReservedDevice() throws Exception {
+        MvcResult mvcResult = mvc
+                .perform(get("/api/users")
+                        .with(oauth2Login()
+                                .attributes(a -> {
+                                    a.put("given_name", "test");
+                                    a.put("family_name", "test");
+                                    a.put("email", "test@test.test");
+                                })))
+                .andReturn();
+        Cookie token = mvcResult.getResponse().getCookie("XSRF-TOKEN");
+
+        byte[] requestBody = mapper.writeValueAsBytes(deviceFromDB);
+
+        mvc
+                .perform(post("/api/owners")
+                        .with(r -> {
+                            oauth2Login();
+                            r.setSession(Objects.requireNonNull(mvcResult.getRequest().getSession()));
+                            r.addHeader("X-XSRF-TOKEN", Objects.requireNonNull(token).getValue());
+                            r.setCookies(token);
+                            r.setContentType(MediaType.APPLICATION_JSON.toString());
+                            r.setContent(requestBody);
+                            return r;
+                        }))
+                .andExpect(status().isOk());
+
+        MvcResult mvcResultSecond = mvc
+                .perform(get("/api/users")
+                        .with(oauth2Login()
+                                .attributes(a -> {
+                                    a.put("given_name", "test2");
+                                    a.put("family_name", "test2");
+                                    a.put("email", "test@test.test2");
+                                })))
+                .andReturn();
+
+        Cookie tokenSecond = mvcResultSecond.getResponse().getCookie("XSRF-TOKEN");
+
+        MvcResult result = mvc
+                .perform(post("/api/owners")
+                        .with(r -> {
+                            oauth2Login();
+                            r.setSession(Objects.requireNonNull(mvcResultSecond.getRequest().getSession()));
+                            r.addHeader("X-XSRF-TOKEN", Objects.requireNonNull(tokenSecond).getValue());
+                            r.setCookies(tokenSecond);
+                            r.setContentType(MediaType.APPLICATION_JSON.toString());
+                            r.setContent(requestBody);
+                            return r;
+                        }))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        ServerExceptionResponse exceptionResponse = mapper.readValue(
+                result.getResponse().getContentAsString(),
+                ServerExceptionResponse.class);
+
+        assertEquals(ErrorCode.DEVICE_RESERVED, exceptionResponse.getErrors().get(0));
     }
 
 
