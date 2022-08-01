@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import net.deviceinventory.dto.request.NewDeviceRequest;
 import net.deviceinventory.model.Device;
 import net.deviceinventory.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +25,12 @@ public class AdminController {
     AdminService adminService;
 
     @PostMapping(value = "/devices", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Device addDevice(@Valid @RequestBody Device device) {
+    public Device addDevice(@Valid @RequestBody NewDeviceRequest device) {
         return adminService.addDevice(device);
     }
 
     @PutMapping(value = "/devices/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Device editDevice(@Valid @RequestBody Device device) {
+    public Device editDevice(@Valid @RequestBody NewDeviceRequest device) {
         return adminService.editDevice(device);
     }
 

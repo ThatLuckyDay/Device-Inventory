@@ -3,21 +3,18 @@ package net.deviceinventory.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.deviceinventory.dto.response.UserResponse;
 import net.deviceinventory.exceptions.ErrorCode;
-import net.deviceinventory.exceptions.ServerException;
 import net.deviceinventory.exceptions.ServerExceptionResponse;
 import net.deviceinventory.model.Device;
 import net.deviceinventory.model.Role;
 import net.deviceinventory.model.RoleType;
 import net.deviceinventory.model.User;
 import net.deviceinventory.service.DebugService;
-import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -27,7 +24,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
-import java.util.List;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -102,10 +98,7 @@ class UserControllerTest {
                             r.setContent(requestBody);
                             return r;
                         }))
-                .andExpectAll(
-                        status().isOk(),
-                        cookie().doesNotExist("XSRF-TOKEN")
-                )
+                .andExpect(status().isOk())
                 .andReturn();
 
         deviceFromDB = mapper.readValue(deviceResult.getResponse().getContentAsString(), Device.class);
@@ -183,8 +176,7 @@ class UserControllerTest {
                 .andExpectAll(
                         status().isOk(),
                         cookie().doesNotExist("XSRF-TOKEN")
-                )
-                .andReturn();
+                );
     }
 
     @Test
@@ -214,10 +206,7 @@ class UserControllerTest {
                             r.setCookies(token);
                             return r;
                         }))
-                .andExpectAll(
-                        status().isOk(),
-                        cookie().doesNotExist("XSRF-TOKEN")
-                )
+                .andExpect(status().isOk())
                 .andReturn();
 
         UserResponse user = mapper.readValue(result.getResponse().getContentAsString(), UserResponse.class);
@@ -262,10 +251,7 @@ class UserControllerTest {
                             r.setCookies(token);
                             return r;
                         }))
-                .andExpectAll(
-                        status().isOk(),
-                        cookie().doesNotExist("XSRF-TOKEN")
-                )
+                .andExpect(status().isOk())
                 .andReturn();
 
         Device[] devices = mapper.readValue(result.getResponse().getContentAsString(), Device[].class);
@@ -307,10 +293,7 @@ class UserControllerTest {
                             r.setCookies(token);
                             return r;
                         }))
-                .andExpectAll(
-                        status().isOk(),
-                        cookie().doesNotExist("XSRF-TOKEN")
-                )
+                .andExpect(status().isOk())
                 .andReturn();
 
         Device device = mapper.readValue(result.getResponse().getContentAsString(), Device.class);
@@ -372,6 +355,7 @@ class UserControllerTest {
                                     a.put("email", "test@test.test");
                                 })))
                 .andReturn();
+
         Cookie token = mvcResult.getResponse().getCookie("XSRF-TOKEN");
 
         byte[] requestBody = mapper.writeValueAsBytes(deviceFromDB);
@@ -387,10 +371,7 @@ class UserControllerTest {
                             r.setContent(requestBody);
                             return r;
                         }))
-                .andExpectAll(
-                        status().isOk(),
-                        cookie().doesNotExist("XSRF-TOKEN")
-                )
+                .andExpectAll(status().isOk())
                 .andReturn();
 
         UserResponse userResponse = mapper.readValue(result.getResponse().getContentAsString(), UserResponse.class);
