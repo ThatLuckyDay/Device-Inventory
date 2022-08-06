@@ -60,4 +60,9 @@ public class UserController {
         return userService.takeDevice(device, oAuth2User);
     }
 
+    @PostMapping(value = "/admins", produces = MediaType.APPLICATION_JSON_VALUE)
+    public User signInLikeAdmin(@AuthenticationPrincipal OAuth2User oAuth2User) {
+        return userService.addAdminAuthority(oAuth2User);
+    }
+
 }

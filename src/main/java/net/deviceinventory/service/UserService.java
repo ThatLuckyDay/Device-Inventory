@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @NoArgsConstructor
@@ -40,10 +41,6 @@ public class UserService {
         User user = userDtoMapper.fromUserDto(oAuth2User);
         if (userDao.existsByEmail(user.getEmail())) return userDao.findByEmail(user.getEmail())
                 .orElseThrow(() -> new ServerException(ErrorCode.SERVER_ERROR));
-        Set<Role> roles = new HashSet<>();
-        roles.add(new Role(0, RoleType.ROLE_USER));
-        user.setRole(roles);
-        user.setActive(true);
         userDao.save(user);
         return user;
     }
@@ -89,5 +86,39 @@ public class UserService {
                 .findByEmail(user.getEmail())
                 .orElseThrow(() -> new ServerException(ErrorCode.USER_NOT_FOUND, user.getEmail()));
         return userDtoMapper.toUserDto(userData, deviceDao.findByUser(userData));
+    }
+
+
+    public User addAdminAuthority(OAuth2User oAuth2User) {
+        User user = userDtoMapper.fromUserDto(oAuth2User);
+        if (userDao.existsByEmail(user.getEmail())) {
+            User presentUser = userDao.findByEmail(user.getEmail())
+                    .orElseThrow(() -> new ServerException(ErrorCode.SERVER_ERROR));
+            boolean isAdmin = presentUser
+                    .getRole()
+                    .stream()
+                    .map(Role::getName)
+                    .collect(Collectors.toList())
+                    .contains(RoleType.ROLE_ADMIN);
+            if (isAdmin) return presentUser;
+            else presentUser.getRole().add(new Role(0, RoleType.ROLE_ADMIN));
+            userDao.save(presentUser);
+            return presentUser;
+        }
+        throw new ServerException(ErrorCode.USER_NOT_FOUND, user.getEmail());
+    }
+
+    public User removeAdminAuthority(OAuth2User oAuth2User) {
+        User user = userDtoMapper.fromUserDto(oAuth2User);
+        if (userDao.existsByEmail(user.getEmail())) {
+            User presentUser = userDao.findByEmail(user.getEmail())
+                    .orElseThrow(() -> new ServerException(ErrorCode.SERVER_ERROR));
+            presentUser
+                    .getRole()
+                    .removeIf(role -> role.getName() == RoleType.ROLE_ADMIN);
+            userDao.save(presentUser);
+            return presentUser;
+        }
+        throw new ServerException(ErrorCode.USER_NOT_FOUND, user.getEmail());
     }
 }

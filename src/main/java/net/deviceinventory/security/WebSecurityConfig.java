@@ -3,6 +3,7 @@ package net.deviceinventory.security;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -12,6 +13,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     final String[] AUTH_WHITELIST = {

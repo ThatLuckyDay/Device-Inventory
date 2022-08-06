@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -68,7 +69,9 @@ class UserControllerTest {
                                     a.put("given_name", "admin");
                                     a.put("family_name", "admin");
                                     a.put("email", "admin@admin.admin");
-                                })))
+                                })
+                                .authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))
+                        ))
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON)
@@ -113,7 +116,9 @@ class UserControllerTest {
                                     a.put("given_name", "test");
                                     a.put("family_name", "test");
                                     a.put("email", "test@test.test");
-                                })))
+                                })
+                                .authorities(new SimpleGrantedAuthority("ROLE_USER"))
+                        ))
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON)
@@ -162,7 +167,9 @@ class UserControllerTest {
                                     a.put("given_name", "test");
                                     a.put("family_name", "test");
                                     a.put("email", "test@test.test");
-                                })))
+                                })
+                                .authorities(new SimpleGrantedAuthority("ROLE_USER"))
+                        ))
                 .andReturn();
         Cookie token = mvcResult.getResponse().getCookie("XSRF-TOKEN");
         mvc
@@ -195,7 +202,9 @@ class UserControllerTest {
                                     a.put("given_name", "test");
                                     a.put("family_name", "test");
                                     a.put("email", "test@test.test");
-                                })))
+                                })
+                                .authorities(new SimpleGrantedAuthority("ROLE_USER"))
+                        ))
                 .andReturn();
         Cookie token = mvcResult.getResponse().getCookie("XSRF-TOKEN");
         MvcResult result = mvc
@@ -240,7 +249,9 @@ class UserControllerTest {
                                     a.put("given_name", "test");
                                     a.put("family_name", "test");
                                     a.put("email", "test@test.test");
-                                })))
+                                })
+                                .authorities(new SimpleGrantedAuthority("ROLE_USER"))
+                        ))
                 .andReturn();
         Cookie token = mvcResult.getResponse().getCookie("XSRF-TOKEN");
         MvcResult result = mvc
@@ -282,7 +293,9 @@ class UserControllerTest {
                                     a.put("given_name", "test");
                                     a.put("family_name", "test");
                                     a.put("email", "test@test.test");
-                                })))
+                                })
+                                .authorities(new SimpleGrantedAuthority("ROLE_USER"))
+                        ))
                 .andReturn();
         Cookie token = mvcResult.getResponse().getCookie("XSRF-TOKEN");
         MvcResult result = mvc
@@ -323,7 +336,9 @@ class UserControllerTest {
                                     a.put("given_name", "test");
                                     a.put("family_name", "test");
                                     a.put("email", "test@test.test");
-                                })))
+                                })
+                                .authorities(new SimpleGrantedAuthority("ROLE_USER"))
+                        ))
                 .andReturn();
         Cookie token = mvcResult.getResponse().getCookie("XSRF-TOKEN");
         MvcResult result = mvc
@@ -353,7 +368,9 @@ class UserControllerTest {
                                     a.put("given_name", "test");
                                     a.put("family_name", "test");
                                     a.put("email", "test@test.test");
-                                })))
+                                })
+                                .authorities(new SimpleGrantedAuthority("ROLE_USER"))
+                        ))
                 .andReturn();
 
         Cookie token = mvcResult.getResponse().getCookie("XSRF-TOKEN");
@@ -408,7 +425,9 @@ class UserControllerTest {
                                     a.put("given_name", "test");
                                     a.put("family_name", "test");
                                     a.put("email", "test@test.test");
-                                })))
+                                })
+                                .authorities(new SimpleGrantedAuthority("ROLE_USER"))
+                        ))
                 .andReturn();
         Cookie token = mvcResult.getResponse().getCookie("XSRF-TOKEN");
 
@@ -451,7 +470,9 @@ class UserControllerTest {
                                     a.put("given_name", "test");
                                     a.put("family_name", "test");
                                     a.put("email", "test@test.test");
-                                })))
+                                })
+                                .authorities(new SimpleGrantedAuthority("ROLE_USER"))
+                        ))
                 .andReturn();
         Cookie token = mvcResult.getResponse().getCookie("XSRF-TOKEN");
 
@@ -477,7 +498,9 @@ class UserControllerTest {
                                     a.put("given_name", "test2");
                                     a.put("family_name", "test2");
                                     a.put("email", "test@test.test2");
-                                })))
+                                })
+                                .authorities(new SimpleGrantedAuthority("ROLE_USER"))
+                        ))
                 .andReturn();
 
         Cookie tokenSecond = mvcResultSecond.getResponse().getCookie("XSRF-TOKEN");

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -65,7 +66,9 @@ class AdminControllerTest {
                                     a.put("given_name", "test");
                                     a.put("family_name", "test");
                                     a.put("email", "test@test.test");
-                                })))
+                                })
+                                .authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))
+                        ))
                 .andExpect(status().isOk())
                 .andReturn();
 

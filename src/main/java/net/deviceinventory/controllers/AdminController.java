@@ -21,6 +21,7 @@ import javax.validation.Valid;
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 @RequestMapping(value = "/api")
 @Validated
+@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 public class AdminController {
     AdminService adminService;
 
