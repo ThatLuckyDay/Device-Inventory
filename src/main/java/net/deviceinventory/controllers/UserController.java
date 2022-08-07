@@ -60,9 +60,16 @@ public class UserController {
         return userService.takeDevice(device, oAuth2User);
     }
 
-    @PostMapping(value = "/admins", produces = MediaType.APPLICATION_JSON_VALUE)
-    public User signInLikeAdmin(@AuthenticationPrincipal OAuth2User oAuth2User) {
+    @PutMapping(value = "/admins/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public UserResponse takeRoleAdmin(@AuthenticationPrincipal OAuth2User oAuth2User,
+                                      @PathVariable(required = false) long id) {
         return userService.addAdminAuthority(oAuth2User);
+    }
+
+    @DeleteMapping(value = "/admins/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public UserResponse delRoleAdmin(@AuthenticationPrincipal OAuth2User oAuth2User,
+                             @PathVariable(required = false) long id) {
+        return userService.removeAdminAuthority(oAuth2User);
     }
 
 }

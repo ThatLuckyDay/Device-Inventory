@@ -89,7 +89,7 @@ public class UserService {
     }
 
 
-    public User addAdminAuthority(OAuth2User oAuth2User) {
+    public UserResponse addAdminAuthority(OAuth2User oAuth2User) {
         User user = userDtoMapper.fromUserDto(oAuth2User);
         if (userDao.existsByEmail(user.getEmail())) {
             User presentUser = userDao.findByEmail(user.getEmail())
@@ -100,15 +100,16 @@ public class UserService {
                     .map(Role::getName)
                     .collect(Collectors.toList())
                     .contains(RoleType.ROLE_ADMIN);
-            if (isAdmin) return presentUser;
+            if (isAdmin) throw new ServerException(ErrorCode.ROLE_ALREADY_ADDED, user.getEmail());
             else presentUser.getRole().add(new Role(0, RoleType.ROLE_ADMIN));
             userDao.save(presentUser);
-            return presentUser;
+            List<Device> devices = deviceDao.findByUser(presentUser);
+            return userDtoMapper.toUserDto(presentUser, devices);
         }
         throw new ServerException(ErrorCode.USER_NOT_FOUND, user.getEmail());
     }
 
-    public User removeAdminAuthority(OAuth2User oAuth2User) {
+    public UserResponse removeAdminAuthority(OAuth2User oAuth2User) {
         User user = userDtoMapper.fromUserDto(oAuth2User);
         if (userDao.existsByEmail(user.getEmail())) {
             User presentUser = userDao.findByEmail(user.getEmail())
@@ -117,7 +118,8 @@ public class UserService {
                     .getRole()
                     .removeIf(role -> role.getName() == RoleType.ROLE_ADMIN);
             userDao.save(presentUser);
-            return presentUser;
+            List<Device> devices = deviceDao.findByUser(presentUser);
+            return userDtoMapper.toUserDto(presentUser, devices);
         }
         throw new ServerException(ErrorCode.USER_NOT_FOUND, user.getEmail());
     }

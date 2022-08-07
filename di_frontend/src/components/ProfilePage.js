@@ -4,18 +4,11 @@ import Header from './Header.js';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import { useNavigate } from 'react-router-dom';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
 
 
 const ProfilePage = () => {
-  return (
-    <div>
-      <Header />
-      <Profile/>
-    </div>
-  );
-}
-
-const Profile = () => {
   const [profile, setProfile] = useState(null);
   const navigate = useNavigate();
   useEffect(() => {
@@ -32,7 +25,20 @@ const Profile = () => {
         if (data === null) navigate('/');
       })
   }, [setProfile] );
-  if (profile === null) return;
+  const setData = data => {
+    setProfile(data);
+  }
+  return (
+    <div>
+      <Header/>
+      <Profile profile={profile} setProfile={setProfile}/>
+      <AdminUser profile={profile} setProfile={setProfile}/>
+    </div>
+  );
+}
+
+const Profile = (props) => {
+  if (props.profile === null) return;
   return (
     <Box
       sx={{
@@ -47,7 +53,7 @@ const Profile = () => {
     <TextField
       id="filled-read-only-input"
       label="First name"
-      defaultValue={profile.firstName}
+      defaultValue={props.profile.firstName}
       InputProps={{
         readOnly: true,
       }}
@@ -56,7 +62,7 @@ const Profile = () => {
     <TextField
       id="filled-read-only-input"
       label="Last name"
-      defaultValue={profile.lastName}
+      defaultValue={props.profile.lastName}
       InputProps={{
         readOnly: true,
       }}
@@ -65,7 +71,7 @@ const Profile = () => {
     <TextField
       id="filled-read-only-input"
       label="Email"
-      defaultValue={profile.email}
+      defaultValue={props.profile.email}
       InputProps={{
         readOnly: true,
       }}
@@ -75,7 +81,7 @@ const Profile = () => {
       id="filled-read-only-input"
       label="Role"
       defaultValue={
-        profile.roles.map( i => {
+        props.profile.roles.map( i => {
           let roleText = i.name.replace('ROLE_', '').toLowerCase();
           return roleText[0].toUpperCase() + roleText.slice(1);
         }
@@ -89,7 +95,7 @@ const Profile = () => {
       id="filled-read-only-input"
       label="Devices"
       defaultValue={
-        profile.devices.map( i => {
+        props.profile.devices.map( i => {
           return ` ${i.name} (${i.qrcode})`;
         }
       )}
@@ -100,6 +106,49 @@ const Profile = () => {
     />
     </Box>
   );
+}
+
+
+const AdminUser = (props) => {
+  const [cookies] = useCookies(['XSRF-TOKEN']);
+  const handleClickEnable = () => {
+    fetch('/api/admins/' + props.profile.id, {
+      credentials: 'include',
+      method: 'PUT',
+      headers : {
+        'X-XSRF-TOKEN': cookies['XSRF-TOKEN'],
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        props.setProfile(data);
+        window.location.reload();
+      })
+  }
+  const handleClickDisable = () => {
+    fetch('/api/admins/' + props.profile.id, {
+      credentials: 'include',
+      method: 'DELETE',
+      headers : {
+        'X-XSRF-TOKEN': cookies['XSRF-TOKEN'],
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        props.setProfile(data);
+        window.location.reload();
+      })
+  }
+  return (
+    <Stack sx={{justifyContent: 'center'}} direction="row" spacing={2} marginTop={2}>
+      <Button variant="contained" onClick={handleClickDisable}>DIS ADMIN</Button>
+      <Button variant="contained" color="error" onClick={handleClickEnable}>EN ADMIN</Button>
+    </Stack>
+  )
 }
 
 export default ProfilePage;

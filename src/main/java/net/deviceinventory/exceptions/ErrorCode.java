@@ -6,6 +6,8 @@ public enum ErrorCode {
     EMPTY_FIELD("Required field"),
     SERVER_ERROR("undefined", "Server Error"),
     USER_NOT_FOUND("User with email %s not found"),
+    ROLE_ALREADY_ADDED("The user = %s is already an administrator"),
+    ROLE_ALREADY_DELETE("The user = %s is no longer an administrator"),
     UNDEFINED_ERROR("undefined", "%s"),
     DEVICE_RESERVED("The device is being used by user %s "),
     QR_CODE_EXIST("QR Code already exists by Device with id = %s"),
