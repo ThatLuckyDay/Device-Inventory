@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import javax.validation.Valid;
 import java.util.Optional;
 
 @Service
@@ -24,24 +23,27 @@ import java.util.Optional;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Transactional
 @Slf4j
-public class AdminService {
+public class DeviceService {
     AdminDtoMapper mapper;
     DeviceDao deviceDao;
 
     public Device addDevice(NewDeviceRequest newDevice) {
         Device device = mapper.fromDeviceDto(newDevice);
         Optional<Device> deviceByQR = deviceDao.findByQRCode(device.getQRCode());
-        if (deviceByQR.isPresent())
+        if (deviceByQR.isPresent()) {
             throw new ServerException(ErrorCode.QR_CODE_EXIST, String.valueOf(deviceByQR.get().getId()));
+        }
         return deviceDao.save(device);
     }
 
     public Device editDevice(NewDeviceRequest newDevice) {
         Device device = mapper.fromDeviceDto(newDevice);
         Optional<Device> deviceByQR = deviceDao.findByQRCode(device.getQRCode());
-        if (deviceByQR.isPresent())
-            if (deviceByQR.get().getId() != device.getId())
+        if (deviceByQR.isPresent()) {
+            if (deviceByQR.get().getId() != device.getId()) {
                 throw new ServerException(ErrorCode.QR_CODE_EXIST, String.valueOf(deviceByQR.get().getId()));
+            }
+        }
         return deviceDao.save(device);
     }
 
@@ -52,4 +54,11 @@ public class AdminService {
         deviceDao.deleteById(id);
         return device;
     }
+
+    public Device getDevice(Long id) {
+        return deviceDao
+                .findById(id)
+                .orElseThrow(() -> new ServerException(ErrorCode.DEVICE_NOT_FOUND, String.valueOf(id)));
+    }
+
 }

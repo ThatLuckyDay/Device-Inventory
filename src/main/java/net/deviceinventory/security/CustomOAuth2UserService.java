@@ -45,7 +45,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .collect(Collectors.toList())
                 .contains(RoleType.ROLE_ADMIN);
         if (isAdmin) {
-            String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
+            String userNameAttributeName = userRequest
+                    .getClientRegistration()
+                    .getProviderDetails()
+                    .getUserInfoEndpoint()
+                    .getUserNameAttributeName();
             Set<GrantedAuthority> authorities = new HashSet<>(oAuth2User.getAuthorities());
             authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
             return new DefaultOAuth2User(authorities, oAuth2User.getAttributes(), userNameAttributeName);

@@ -22,7 +22,9 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,8 +41,9 @@ public class UserService {
 
     public User signIn(OAuth2User oAuth2User) {
         User user = userDtoMapper.fromUserDto(oAuth2User);
-        if (userDao.existsByEmail(user.getEmail())) return userDao.findByEmail(user.getEmail())
-                .orElseThrow(() -> new ServerException(ErrorCode.SERVER_ERROR));
+        if (userDao.existsByEmail(user.getEmail())) {
+            return userDao.findByEmail(user.getEmail()).orElseThrow(() -> new ServerException(ErrorCode.SERVER_ERROR));
+        }
         userDao.save(user);
         return user;
     }
@@ -63,31 +66,6 @@ public class UserService {
         List<Device> devices = deviceDao.findByUser(userData);
         return userDtoMapper.toUserDto(userData, devices);
     }
-
-    public Device getDevice(Long id) {
-        return deviceDao
-                .findById(id)
-                .orElseThrow(() -> new ServerException(ErrorCode.DEVICE_NOT_FOUND, String.valueOf(id)));
-    }
-
-    public UserResponse takeDevice(DeviceRequest deviceDto, OAuth2User oAuth2User) {
-        Device device = userDtoMapper.fromDeviceDto(deviceDto);
-        Optional<Device> deviceData = deviceDao.findByQRCode(device.getQRCode());
-        if (deviceData.isEmpty()) throw new ServerException(ErrorCode.QR_CODE_NOT_EXIST, device.getQRCode());
-        if (deviceData.get().getUser() != null)
-            throw new ServerException(ErrorCode.DEVICE_RESERVED, deviceData.get().getUser().getEmail());
-        User user = userDtoMapper.fromUserDto(oAuth2User);
-        User userData = userDao
-                .findByEmail(user.getEmail())
-                .orElseThrow(() -> new ServerException(ErrorCode.USER_NOT_FOUND, user.getEmail()));
-        deviceData.get().setUser(userData);
-        deviceDao.save(deviceData.get());
-        userData = userDao
-                .findByEmail(user.getEmail())
-                .orElseThrow(() -> new ServerException(ErrorCode.USER_NOT_FOUND, user.getEmail()));
-        return userDtoMapper.toUserDto(userData, deviceDao.findByUser(userData));
-    }
-
 
     public UserResponse addAdminAuthority(OAuth2User oAuth2User) {
         User user = userDtoMapper.fromUserDto(oAuth2User);
@@ -122,5 +100,26 @@ public class UserService {
             return userDtoMapper.toUserDto(presentUser, devices);
         }
         throw new ServerException(ErrorCode.USER_NOT_FOUND, user.getEmail());
+    }
+
+    public UserResponse takeDevice(DeviceRequest deviceDto, OAuth2User oAuth2User) {
+        Device device = userDtoMapper.fromDeviceDto(deviceDto);
+        Optional<Device> deviceData = deviceDao.findByQRCode(device.getQRCode());
+        if (deviceData.isEmpty()) {
+            throw new ServerException(ErrorCode.QR_CODE_NOT_EXIST, device.getQRCode());
+        }
+        if (deviceData.get().getUser() != null) {
+            throw new ServerException(ErrorCode.DEVICE_RESERVED, deviceData.get().getUser().getEmail());
+        }
+        User user = userDtoMapper.fromUserDto(oAuth2User);
+        User userData = userDao
+                .findByEmail(user.getEmail())
+                .orElseThrow(() -> new ServerException(ErrorCode.USER_NOT_FOUND, user.getEmail()));
+        deviceData.get().setUser(userData);
+        deviceDao.save(deviceData.get());
+        userData = userDao
+                .findByEmail(user.getEmail())
+                .orElseThrow(() -> new ServerException(ErrorCode.USER_NOT_FOUND, user.getEmail()));
+        return userDtoMapper.toUserDto(userData, deviceDao.findByUser(userData));
     }
 }
