@@ -5,7 +5,11 @@ import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.OAuth2SchemeBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.*;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.AuthorizationScope;
+import springfox.documentation.service.Contact;
+import springfox.documentation.service.SecurityReference;
+import springfox.documentation.service.SecurityScheme;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
@@ -50,8 +54,7 @@ public class SwaggerConfiguration {
         return SecurityConfigurationBuilder.builder()
                 .clientId("542941100377-rktqhqpujilfkpo3l4jb6js8khm254d2.apps.googleusercontent.com")
                 .clientSecret("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")
-                .scopeSeparator(" ")
-                .useBasicAuthenticationWithAccessCodeGrant(true)
+                .scopeSeparator(",")
                 .build();
     }
 
@@ -83,7 +86,7 @@ public class SwaggerConfiguration {
     }
 
     private List<SecurityReference> readAccessAuth() {
-        AuthorizationScope[] authorizationScopes = new AuthorizationScope[] { authorizationScopes().get(0) };
+        AuthorizationScope[] authorizationScopes = new AuthorizationScope[]{authorizationScopes().get(0)};
         return of(new SecurityReference("my_oAuth_security_schema", authorizationScopes));
     }
 

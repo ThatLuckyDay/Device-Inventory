@@ -40,7 +40,7 @@ public class UserController {
     UserService userService;
 
     @ApiOperation(value = "End user session")
-    @PostMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/users")
     public void signOut(HttpServletRequest request) {
         userService.signOut(request);
     }

@@ -24,13 +24,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/swagger-ui.html",
             "/swagger-ui/**",
             "/v3/api-docs",
-            "/api/user"
+            "/api/users"
     };
 
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        SimpleUrlAuthenticationFailureHandler handler = new SimpleUrlAuthenticationFailureHandler("/");
+        SimpleUrlAuthenticationFailureHandler handler =
+                new SimpleUrlAuthenticationFailureHandler("http://localhost:3000/");
 
         http
                 .authorizeRequests(a -> a
@@ -44,7 +45,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 )
                 .logout(l -> l
-                        .logoutSuccessUrl("/").permitAll()
+                        .logoutSuccessUrl("http://localhost:3000/").permitAll()
                 )
                 .oauth2Login(o -> o
                         .failureHandler((request, response, exception) -> {
@@ -54,6 +55,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         .defaultSuccessUrl("http://localhost:3000/")
                 );
     }
-
 
 }
