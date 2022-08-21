@@ -16,15 +16,25 @@ import net.deviceinventory.model.Device;
 import net.deviceinventory.model.Role;
 import net.deviceinventory.model.RoleType;
 import net.deviceinventory.model.User;
+import net.deviceinventory.security.CustomOAuth2UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,6 +47,7 @@ public class UserService {
     UserDtoMapper userDtoMapper;
     UserDao userDao;
     DeviceDao deviceDao;
+    CustomOAuth2UserService securityService;
 
 
     public User signIn(OAuth2User oAuth2User) {
@@ -82,6 +93,17 @@ public class UserService {
             else presentUser.getRole().add(new Role(0, RoleType.ROLE_ADMIN));
             userDao.save(presentUser);
             List<Device> devices = deviceDao.findByUser(presentUser);
+
+            Set<GrantedAuthority> authorities = new HashSet<>(oAuth2User.getAuthorities());
+            authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+
+            Authentication on = new OAuth2AuthenticationToken(
+                    new DefaultOAuth2User(authorities, oAuth2User.getAttributes(), "sub"),
+                    authorities,
+                    HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);
+
+            SecurityContextHolder.getContext().setAuthentication(on);
+
             return userDtoMapper.toUserDto(presentUser, devices);
         }
         throw new ServerException(ErrorCode.USER_NOT_FOUND, user.getEmail());
@@ -97,6 +119,17 @@ public class UserService {
                     .removeIf(role -> role.getName() == RoleType.ROLE_ADMIN);
             userDao.save(presentUser);
             List<Device> devices = deviceDao.findByUser(presentUser);
+
+            Set<GrantedAuthority> authorities = new HashSet<>(oAuth2User.getAuthorities());
+            authorities.removeIf(auth -> auth.getAuthority().equals(RoleType.ROLE_ADMIN.name()));
+
+            Authentication on = new OAuth2AuthenticationToken(
+                    new DefaultOAuth2User(authorities, oAuth2User.getAttributes(), "sub"),
+                    authorities,
+                    HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);
+
+            SecurityContextHolder.getContext().setAuthentication(on);
+
             return userDtoMapper.toUserDto(presentUser, devices);
         }
         throw new ServerException(ErrorCode.USER_NOT_FOUND, user.getEmail());

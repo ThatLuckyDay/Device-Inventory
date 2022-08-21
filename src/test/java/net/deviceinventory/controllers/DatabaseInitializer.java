@@ -10,7 +10,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @UtilityClass
 public class DatabaseInitializer {
 
-    public static final PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:14.3")
+    public static final PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:14.1-alpine")
             .withDatabaseName("device-inventory-db")
             .withUsername("admin")
             .withPassword("admin")
