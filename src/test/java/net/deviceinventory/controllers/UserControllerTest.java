@@ -30,10 +30,7 @@ import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oauth2Login;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -250,7 +247,7 @@ class UserControllerTest {
     }
 
     @Test
-    void listDevices() throws Exception {
+    void listDevicesTest() throws Exception {
         MvcResult mvcResult = mvc
                 .perform(get("/api/users")
                         .with(oauth2Login()
@@ -294,7 +291,7 @@ class UserControllerTest {
     }
 
     @Test
-    void findDevice() throws Exception {
+    void findDeviceTest() throws Exception {
         MvcResult mvcResult = mvc
                 .perform(get("/api/users")
                         .with(oauth2Login()
@@ -337,7 +334,7 @@ class UserControllerTest {
     }
 
     @Test
-    void findDeviceFailNoSuchDevice() throws Exception {
+    void findDeviceFailNoSuchDeviceTest() throws Exception {
         MvcResult mvcResult = mvc
                 .perform(get("/api/users")
                         .with(oauth2Login()
@@ -369,7 +366,7 @@ class UserControllerTest {
     }
 
     @Test
-    void takeDevice() throws Exception {
+    void takeDeviceTest() throws Exception {
         MvcResult mvcResult = mvc
                 .perform(get("/api/users")
                         .with(oauth2Login()
@@ -419,6 +416,68 @@ class UserControllerTest {
     }
 
     @Test
+    void returnDeviceTest() throws Exception {
+        MvcResult mvcResult = mvc
+                .perform(get("/api/users")
+                        .with(oauth2Login()
+                                .attributes(a -> {
+                                    a.put("given_name", "test");
+                                    a.put("family_name", "test");
+                                    a.put("email", "test@test.test");
+                                })
+                                .authorities(new SimpleGrantedAuthority("ROLE_USER"))
+                        ))
+                .andReturn();
+
+        Cookie token = mvcResult.getResponse().getCookie("XSRF-TOKEN");
+
+        byte[] requestBody = mapper.writeValueAsBytes(deviceFromDB);
+
+        mvc
+                .perform(post("/api/owners")
+                        .with(r -> {
+                            oauth2Login();
+                            r.setSession(Objects.requireNonNull(mvcResult.getRequest().getSession()));
+                            r.addHeader("X-XSRF-TOKEN", Objects.requireNonNull(token).getValue());
+                            r.setCookies(token);
+                            r.setContentType(MediaType.APPLICATION_JSON.toString());
+                            r.setContent(requestBody);
+                            return r;
+                        }))
+                .andExpectAll(status().isOk())
+                .andReturn();
+
+        MvcResult result = mvc
+                .perform(post("/api/owners")
+                        .with(r -> {
+                            oauth2Login();
+                            r.setSession(Objects.requireNonNull(mvcResult.getRequest().getSession()));
+                            r.addHeader("X-XSRF-TOKEN", Objects.requireNonNull(token).getValue());
+                            r.setCookies(token);
+                            r.setContentType(MediaType.APPLICATION_JSON.toString());
+                            r.setContent(requestBody);
+                            return r;
+                        }))
+                .andExpectAll(status().isOk())
+                .andReturn();
+
+        UserResponse userResponse = mapper.readValue(result.getResponse().getContentAsString(), UserResponse.class);
+
+        assertNotNull(userResponse);
+
+        Role[] userRole = userResponse.getRoles().toArray(Role[]::new);
+
+        assertAll(
+                () -> assertTrue(userResponse.getDevices().isEmpty()),
+                () -> assertEquals("test@test.test", userResponse.getEmail()),
+                () -> assertEquals("test", userResponse.getFirstName()),
+                () -> assertEquals("test", userResponse.getLastName()),
+                () -> assertEquals(userRole.length, 1),
+                () -> assertEquals(userRole[0].getName(), RoleType.ROLE_USER)
+        );
+    }
+
+    @Test
     void takeDeviceFailPermissionDeniedTest() throws Exception {
         mvc
                 .perform(post("/api/owners"))
@@ -426,7 +485,7 @@ class UserControllerTest {
     }
 
     @Test
-    void takeDeviceFailNoSuchDevice() throws Exception {
+    void takeDeviceFailNoSuchDeviceTest() throws Exception {
         MvcResult mvcResult = mvc
                 .perform(get("/api/users")
                         .with(oauth2Login()
@@ -471,7 +530,7 @@ class UserControllerTest {
     }
 
     @Test
-    void takeDeviceFailReservedDevice() throws Exception {
+    void takeDeviceFailReservedDeviceTest() throws Exception {
         MvcResult mvcResult = mvc
                 .perform(get("/api/users")
                         .with(oauth2Login()

@@ -79,9 +79,9 @@ public class UserController {
 
     @ApiOperation(value = "Write device to user")
     @PostMapping(value = "/owners", produces = MediaType.APPLICATION_JSON_VALUE)
-    public UserResponse takeDevice(@AuthenticationPrincipal OAuth2User oAuth2User,
-                                   @Valid @RequestBody DeviceRequest device) {
-        return userService.takeDevice(device, oAuth2User);
+    public UserResponse assignDevice(@AuthenticationPrincipal OAuth2User oAuth2User,
+                                     @Valid @RequestBody DeviceRequest device) {
+        return userService.assignDevice(device, oAuth2User);
     }
 
 }

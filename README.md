@@ -23,8 +23,8 @@ Alternative: Java 11, PostgreSql 14.1 and Node.js v18.6 (запуск без и�
 [https://github.com/ThatLuckyDay/Device-Inventory.git](https://github.com/ThatLuckyDay/Device-Inventory.git).
 2. Для запуска backend: перейти в {app directory}/ops-tools/docker и выполнить docker-compose up. 
 3. Для запуска frontend:
-   - перейти в {app directory}/di_frontend и загрузить необходимые зависимости node.js - выполнить 
-   команду npm install;
+   - перейти в {app directory}/di_frontend и выполнить команду npm install - загрузка необходимых 
+   зависимостей node.js при первом запуске приложения;
    - выполнить npm start.
 
 Приложение запуститься и будет работать по адресу [http://localhost:3000/](http://localhost:3000/).

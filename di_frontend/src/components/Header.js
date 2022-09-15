@@ -27,7 +27,7 @@ const Header = () => {
     })
       .then(response => response.text())
       .then(body => {
-        if (body !== '') setAuth(true);
+        if (typeof JSON.parse(body).email !== 'undefined') setAuth(true);
         else navigate('/');
       });
   }, [setAuth] );

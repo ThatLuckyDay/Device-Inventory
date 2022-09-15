@@ -26,7 +26,8 @@ const SayHi = () => {
     })
       .then(response => response.text())
       .then(body => {
-        if (body !== '') setUser(JSON.parse(body));
+        if (typeof JSON.parse(body).email === 'undefined') setUser(null);
+        else if (body !== '') setUser(JSON.parse(body));
       });
   }, [setUser] );
   if (cookies['XSRF-TOKEN'] === 'undefined' && user !== null) setUser(null);
