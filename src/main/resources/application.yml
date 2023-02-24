@@ -1,0 +1,34 @@
+spring:
+  ## Oauth2 Security
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 542941100377-rktqhqpujilfkpo3l4jb6js8khm254d2.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - profile
+              - email
+            redirect-uri: http://localhost:8080/login/oauth2/code/google
+  ## PostgreSQL
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/device-inventory-db?currentSchema=di_db}
+    username: admin
+    password: admin
+    driver-class-name: org.postgresql.Driver
+  ## JPA, Hibernate
+  jpa:
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        default_schema: di_db
+  flyway:
+    baselineOnMigrate: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
