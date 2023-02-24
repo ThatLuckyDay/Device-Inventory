@@ -1,5 +1,10 @@
 package net.deviceinventory.service;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -15,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Optional;
 
 @Service
@@ -59,6 +66,24 @@ public class DeviceService {
         return deviceDao
                 .findById(id)
                 .orElseThrow(() -> new ServerException(ErrorCode.DEVICE_NOT_FOUND, String.valueOf(id)));
+    }
+
+    public byte[] generateQRCodeImage(String text, int width, int height) {
+        QRCodeWriter qrCodeWriter = new QRCodeWriter();
+        BitMatrix bitMatrix = null;
+        try {
+            bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, width, height);
+        } catch (WriterException e) {
+            throw new RuntimeException(e);
+        }
+
+        ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
+        try {
+            MatrixToImageWriter.writeToStream(bitMatrix, "PNG", pngOutputStream);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return pngOutputStream.toByteArray();
     }
 
 }
